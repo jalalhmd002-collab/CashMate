@@ -6,68 +6,68 @@
     <title>إدارة الأموال والمصاريف وديون الزبائن</title>
     <style>
         :root {
-            /* لوحة ألوان عصرية صاخبة ومميزة */
-            --bg-deep: #F3F5FC;
+            /* ستايل مستوحى من الصورة المرفقة: خلفية هادئة، بطاقات بيضاء، حدود ناعمة، وشارات دافئة */
+            --bg-deep: #F7F7F5;
             --bg-sidebar: #FFFFFF;
             --bg-card: #FFFFFF;
             --bg-elevated: #FFFFFF;
-            --bg-card-subtle: #EEF2FF;
-            --border-glass-base: #E2E8F0;
-            --border-glass-strong: #CBD5E1;
-            --shadow-card: 0 2px 10px rgba(99, 102, 241, 0.06);
-            --shadow-card-hover: 0 8px 22px rgba(99, 102, 241, 0.13);
-            --shadow-floating: 0 12px 34px rgba(15, 23, 42, 0.12);
-            --header-glass-bg: rgba(255, 255, 255, 0.90);
+            --bg-card-subtle: #F3F4F6;
+            --border-glass-base: #E5E7EB;
+            --border-glass-strong: #D1D5DB;
+            --shadow-card: 0 1px 3px rgba(17, 24, 39, 0.04);
+            --shadow-card-hover: 0 4px 12px rgba(17, 24, 39, 0.07);
+            --shadow-floating: 0 8px 24px rgba(17, 24, 39, 0.09);
+            --header-glass-bg: rgba(255, 255, 255, 0.94);
 
-            /* اللون الأساسي البنفسجي الكهربائي والوردي العصري */
-            --accent-primary: #6366F1;
-            --accent-hover: #4F46E5;
-            --accent-gradient: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
-            --accent-subtle: rgba(99, 102, 241, 0.12);
-            --accent-border: rgba(99, 102, 241, 0.42);
+            /* اللون الأساسي البرتقالي/الكهرماني الدافئ كما في أيقونات الصورة */
+            --accent-primary: #D97706;
+            --accent-hover: #B45309;
+            --accent-gradient: #D97706;
+            --accent-subtle: #FEF9E7;
+            --accent-border: #F3D17A;
 
-            /* ألوان الحالات الصاخبة المتنوعة */
-            --neon-green: #10B981;
-            --neon-green-light: #34D399;
-            --neon-green-subtle: rgba(16, 185, 129, 0.13);
-            --neon-green-border: rgba(16, 185, 129, 0.42);
+            /* ألوان الشارات والحالات مطابقة للصورة */
+            --neon-green: #047857;
+            --neon-green-light: #10B981;
+            --neon-green-subtle: #ECFDF5;
+            --neon-green-border: #A7F3D0;
 
-            --neon-red: #F43F5E;
-            --neon-red-light: #FB7185;
-            --neon-red-subtle: rgba(244, 63, 94, 0.13);
-            --neon-red-border: rgba(244, 63, 94, 0.42);
+            --neon-red: #DC2626;
+            --neon-red-light: #EF4444;
+            --neon-red-subtle: #FEF2F2;
+            --neon-red-border: #FECACA;
 
-            --neon-blue: #0EA5E9;
-            --neon-blue-light: #38BDF8;
-            --neon-blue-subtle: rgba(14, 165, 233, 0.13);
-            --neon-blue-border: rgba(14, 165, 233, 0.42);
+            --neon-blue: #2563EB;
+            --neon-blue-light: #3B82F6;
+            --neon-blue-subtle: #EFF6FF;
+            --neon-blue-border: #BFDBFE;
 
-            --neon-amber: #F59E0B;
-            --neon-amber-light: #FBBF24;
-            --neon-amber-subtle: rgba(245, 158, 11, 0.14);
-            --neon-amber-border: rgba(245, 158, 11, 0.45);
+            --neon-amber: #B45309;
+            --neon-amber-light: #D97706;
+            --neon-amber-subtle: #FEF9E7;
+            --neon-amber-border: #F3D17A;
 
-            --neon-cyan: #06B6D4;
-            --shadow-glow-green: rgba(16, 185, 129, 0.28);
-            --shadow-glow-red: rgba(244, 63, 94, 0.28);
-            --shadow-glow-blue: rgba(99, 102, 241, 0.28);
-            --shadow-glow-amber: rgba(245, 158, 11, 0.28);
+            --neon-cyan: #0369A1;
+            --shadow-glow-green: rgba(4, 120, 87, 0.14);
+            --shadow-glow-red: rgba(220, 38, 38, 0.14);
+            --shadow-glow-blue: rgba(217, 119, 6, 0.16);
+            --shadow-glow-amber: rgba(180, 83, 9, 0.16);
 
             /* النصوص */
-            --text-main: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #64748B;
+            --text-main: #111827;
+            --text-secondary: #4B5563;
+            --text-muted: #6B7280;
 
             /* حقول الإدخال */
-            --input-bg: #F8FAFC;
-            --input-border: #CBD5E1;
+            --input-bg: #FFFFFF;
+            --input-border: #E5E7EB;
 
-            --font-sans: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, system-ui, -apple-system, sans-serif;
-            --font-mono: ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+            --font-sans: 'Segoe UI', Tahoma, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Segoe UI', Tahoma, ui-monospace, Consolas, monospace;
             --radius-sm: 10px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --transition-smooth: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-smooth: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
@@ -145,8 +145,8 @@
         }
 
         .chart-stage-area {
-            border-top: 3px solid #6366F1;
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.04) 0%, #FFFFFF 45%);
+            border-top: 2px solid var(--accent-primary);
+            background: var(--bg-elevated);
             background: var(--bg-elevated);
             box-shadow: var(--shadow-card);
         }
@@ -1814,15 +1814,15 @@
             min-height: 82px;
         }
         .calc-expr-line {
-            font-size: 1.05rem;
-            color: var(--text-secondary);
-            min-height: 1.45em;
+            font-size: 1.75rem;
+            color: var(--text-main);
+            min-height: 1.4em;
             direction: ltr;
             text-align: left;
             width: 100%;
             word-break: break-word;
-            line-height: 1.45;
-            margin-bottom: 4px;
+            line-height: 1.35;
+            margin-bottom: 6px;
         }
         .calc-main-result {
             font-size: 2.45rem;
