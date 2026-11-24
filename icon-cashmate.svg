@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="55%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Apple Squircle Background -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#bgGrad)"/>
+  <rect x="14" y="14" width="484" height="484" rx="100" ry="100" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="3"/>
+
+  <!-- Back Coin -->
+  <g filter="url(#softShadow)">
+    <circle cx="332" cy="148" r="52" fill="url(#coinGrad)" stroke="#FFFFFF" stroke-width="8"/>
+    <circle cx="332" cy="148" r="34" fill="none" stroke="#FEF08A" stroke-width="3" stroke-dasharray="6 5"/>
+    <text x="332" y="160" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="38" font-weight="800" fill="#92400E">$</text>
+  </g>
+
+  <!-- Wallet Body -->
+  <g filter="url(#softShadow)">
+    <rect x="96" y="164" width="320" height="224" rx="44" ry="44" fill="#FFFFFF"/>
+    <!-- Wallet Top Flap -->
+    <path d="M96 208 C96 183.7 115.7 164 140 164 L356 164 C378 164 396 182 396 204 L396 218 L96 218 Z" fill="#EFF6FF"/>
+    <line x1="128" y1="194" x2="296" y2="194" stroke="#93C5FD" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Wallet Clasp -->
+    <rect x="312" y="242" width="116" height="72" rx="22" ry="22" fill="#1E40AF"/>
+    <circle cx="352" cy="278" r="15" fill="#FDE047"/>
+
+    <!-- Subtle Card Accent inside Wallet -->
+    <rect x="136" y="256" width="136" height="16" rx="8" fill="#DBEAFE"/>
+    <rect x="136" y="290" width="92" height="14" rx="7" fill="#E2E8F0"/>
+  </g>
+</svg>

@@ -1,0 +1,226 @@
+    // =========================================================================
+    // الربط السحابي عبر Firebase Firestore وعزل الأجهزة (Device ID Isolation)
+    // =========================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6kt-gmzaP48O9UrMgftscepK9tIzpG9Q",
+        authDomain: "my-gemini-site-2026.firebaseapp.com",
+        projectId: "my-gemini-site-2026",
+        storageBucket: "my-gemini-site-2026.firebasestorage.app",
+        messagingSenderId: "481544142251",
+        appId: "1:481544142251:web:5d53ec7cd5a4d17b4b26ee"
+    };
+
+    let firestoreDb = null;
+    let currentDeviceId = null;
+    let unsubscribeFirestoreSnapshot = null;
+    let isApplyingCloudSnapshot = false;
+    let lastLocalWriteTs = 0;
+
+    function getOrCreateDeviceId() {
+        let id = "";
+        try { id = (localStorage.getItem("cashmate_device_id") || "").trim(); } catch(e) {}
+        if (!id) {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            id = "DEV-" + code;
+            try { localStorage.setItem("cashmate_device_id", id); } catch(e) {}
+        }
+        currentDeviceId = id;
+        const disp = document.getElementById("settingsCurrentDeviceId");
+        if (disp) disp.innerText = id;
+        return id;
+    }
+
+    function updateCloudSyncBadge(isOnline, customLabel = null) {
+        const badge = document.getElementById("cloudSyncStatusBadge");
+        if (!badge) return;
+        if (isOnline && navigator.onLine !== false) {
+            badge.className = "cloud-sync-status-pill is-online";
+            badge.innerText = customLabel || "متصل بالسحابة";
+        } else {
+            badge.className = "cloud-sync-status-pill is-local";
+            badge.innerText = customLabel || "حفظ محلي";
+        }
+    }
+
+    function buildCloudPayload() {
+        return {
+            deviceId: currentDeviceId,
+            appTitle: customAppTitle || "",
+            transactions: allTransactions,
+            clientTransactions: clientTransactions,
+            wallets: paymentWallets,
+            expenseCategories: savedExpenseCategories,
+            incomeCategories: savedIncomeCategories,
+            clients: savedClients,
+            archivedClients: archivedClients,
+            appLockPassword: appLockPassword || "",
+            deletePassword: deletePassword || "",
+            updatedAt: Date.now()
+        };
+    }
+
+    function applyCloudPayload(data) {
+        if (!data || typeof data !== "object") return;
+        isApplyingCloudSnapshot = true;
+        try {
+            if (Array.isArray(data.transactions)) allTransactions = data.transactions;
+            if (Array.isArray(data.clientTransactions)) clientTransactions = data.clientTransactions;
+            if (Array.isArray(data.wallets) && data.wallets.length > 0) paymentWallets = normalizeWalletList(data.wallets);
+            if (Array.isArray(data.expenseCategories) && data.expenseCategories.length > 0) savedExpenseCategories = data.expenseCategories;
+            if (Array.isArray(data.incomeCategories) && data.incomeCategories.length > 0) savedIncomeCategories = data.incomeCategories;
+            if (Array.isArray(data.clients)) savedClients = data.clients;
+            if (Array.isArray(data.archivedClients)) archivedClients = data.archivedClients;
+            if (data.appTitle !== undefined) customAppTitle = data.appTitle || "";
+            if (data.appLockPassword !== undefined) appLockPassword = data.appLockPassword || "";
+            if (data.deletePassword !== undefined) deletePassword = data.deletePassword || "";
+
+            migrateClientTransactionsIfNeeded();
+            persistAllDataOnly();
+            updateAppTitleDisplay();
+            renderDynamicWalletsUI();
+            renderCategoriesDatalistAndChips();
+            updateClientsDatalist();
+            renderMainState();
+            const stmtView = document.getElementById("clientStatementView");
+            if (stmtView && !stmtView.classList.contains("is-hidden")) {
+                renderClientStatement();
+            }
+        } finally {
+            isApplyingCloudSnapshot = false;
+        }
+    }
+
+    function pushCloudSync() {
+        if (!firestoreDb || !currentDeviceId || isApplyingCloudSnapshot) return;
+        try {
+            lastLocalWriteTs = Date.now();
+            const payload = buildCloudPayload();
+            payload.updatedAt = lastLocalWriteTs;
+            firestoreDb.collection("cashmate_devices").doc(currentDeviceId)
+                .set(payload, { merge: true })
+                .then(() => {
+                    updateCloudSyncBadge(true, "متصل ومزامن");
+                })
+                .catch(() => {
+                    updateCloudSyncBadge(false, "حفظ محلي");
+                });
+        } catch(e) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        }
+    }
+
+    function attachDeviceRealtimeListener(deviceId) {
+        if (!firestoreDb || !deviceId) return;
+        if (typeof unsubscribeFirestoreSnapshot === "function") {
+            try { unsubscribeFirestoreSnapshot(); } catch(e) {}
+            unsubscribeFirestoreSnapshot = null;
+        }
+        const docRef = firestoreDb.collection("cashmate_devices").doc(deviceId);
+        unsubscribeFirestoreSnapshot = docRef.onSnapshot((docSnap) => {
+            if (!docSnap.exists) return;
+            updateCloudSyncBadge(true, "متصل بالسحابة");
+            if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+            const data = docSnap.data();
+            if (!data) return;
+            if (data.updatedAt && data.updatedAt <= lastLocalWriteTs) return;
+            applyCloudPayload(data);
+        }, () => {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        });
+    }
+    function initCloudSync() {
+        const devId = getOrCreateDeviceId();
+        if (typeof firebase === "undefined" || !firebase.initializeApp || !firebase.firestore) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+            return;
+        }
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            firestoreDb = firebase.firestore();
+            firestoreDb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+            window.addEventListener("online", () => updateCloudSyncBadge(true, "متصل بالسحابة"));
+            window.addEventListener("offline", () => updateCloudSyncBadge(false, "حفظ محلي"));
+
+            const docRef = firestoreDb.collection("cashmate_devices").doc(devId);
+            docRef.get().then((docSnap) => {
+                if (!docSnap.exists) {
+                    const hasLocalData = allTransactions.length > 0 || clientTransactions.length > 0 || savedClients.length > 0 || Boolean(customAppTitle);
+                    if (hasLocalData) {
+                        pushCloudSync();
+                    } else {
+                        pushCloudSync();
+                    }
+                } else {
+                    const data = docSnap.data();
+                    if (data) {
+                        const cloudEmpty = (!Array.isArray(data.transactions) || data.transactions.length === 0) &&
+                                           (!Array.isArray(data.clientTransactions) || data.clientTransactions.length === 0);
+                        const hasLocalData = allTransactions.length > 0 || clientTransactions.length > 0;
+                        if (cloudEmpty && hasLocalData) {
+                            pushCloudSync();
+                        } else {
+                            applyCloudPayload(data);
+                        }
+                    }
+                    updateCloudSyncBadge(true, "متصل بالسحابة");
+                }
+                attachDeviceRealtimeListener(devId);
+            }).catch(() => {
+                updateCloudSyncBadge(false, "حفظ محلي");
+                attachDeviceRealtimeListener(devId);
+            });
+        } catch(e) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        }
+    }
+
+    function copyDeviceIdToClipboard() {
+        const code = currentDeviceId || getOrCreateDeviceId();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(() => {
+                displayToast("تم نسخ كود الجهاز: " + code);
+            }).catch(() => {
+                displayToast("كود الجهاز: " + code);
+            });
+        } else {
+            displayToast("كود الجهاز: " + code);
+        }
+    }
+
+    function linkAndRestoreDeviceId() {
+        const inp = document.getElementById("linkOtherDeviceIdInput");
+        const newId = (inp ? inp.value : "").trim().toUpperCase();
+        if (!newId) {
+            displayToast("يرجى إدخال كود الجهاز المطلوب ربطه", true);
+            return;
+        }
+        if (!firestoreDb) {
+            displayToast("تعذر الاتصال بقاعدة البيانات السحابية حالياً", true);
+            return;
+        }
+        firestoreDb.collection("cashmate_devices").doc(newId).get().then((docSnap) => {
+            if (!docSnap.exists) {
+                displayToast("لم يتم العثور على بيانات لهذا الكود: " + newId, true);
+                return;
+            }
+            const data = docSnap.data();
+            currentDeviceId = newId;
+            try { localStorage.setItem("cashmate_device_id", newId); } catch(e) {}
+            const disp = document.getElementById("settingsCurrentDeviceId");
+            if (disp) disp.innerText = newId;
+            if (inp) inp.value = "";
+            applyCloudPayload(data);
+            attachDeviceRealtimeListener(newId);
+            updateCloudSyncBadge(true, "متصل ومزامن");
+            displayToast("تم ربط الجهاز واستعادة البيانات بنجاح");
+        }).catch(() => {
+            displayToast("حدث خطأ أثناء الاتصال بالسحابة، تحقق من الإنترنت", true);
+        });
+    }
