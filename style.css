@@ -1377,7 +1377,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 9990;
+            z-index: 150;
             background: transparent;
         }
         .action-menu-backdrop.is-active { display: block; }
@@ -1895,7 +1895,7 @@
             box-shadow: var(--shadow-floating);
             padding: 4px;
             min-width: 118px;
-            z-index: 9999;
+            z-index: 9999 !important;
             flex-direction: column;
             gap: 3px;
         }
@@ -2726,10 +2726,24 @@
             font-size: 0.9rem;
             font-weight: 700 !important;
         }
-        .cat-detail-tx-list {
+        .cat-detail-tx-list,
+        #categoryDetailTxList {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            padding-bottom: 75px;
+            overflow: visible !important;
+        }
+        .unified-tx-card {
+            overflow: visible !important;
+        }
+        .unified-tx-card.has-open-menu,
+        .unified-tx-card:has(.action-dropdown-menu.is-open),
+        .stream-record-card.has-open-menu,
+        .stream-record-card:has(.action-dropdown-menu.is-open) {
+            position: relative !important;
+            z-index: 50 !important;
+            overflow: visible !important;
         }
 
         /* توحيد الأوزان وأزرار الحفظ/الإلغاء في النوافذ */
@@ -4496,13 +4510,26 @@
         body.slate-mode .sidebar-nav-item:hover {
             background: #343940 !important;
         }
-        body.slate-mode .sidebar-nav-item.is-active {
-            background: rgba(59, 130, 246, 0.16) !important;
+        body.slate-mode .sidebar-nav-item.is-active,
+        body.slate-mode .sidebar-nav-item.active,
+        body.slate-mode #sideNavClients.is-active,
+        body.slate-mode #sideNavExpense.is-active,
+        body.slate-mode #sideNavIncome.is-active,
+        body.slate-mode #sideNavHistory.is-active {
+            background: rgba(96, 165, 250, 0.16) !important;
             color: #93C5FD !important;
         }
         body.slate-mode .sidebar-nav-item + .sidebar-nav-item::before {
             background: rgba(255, 255, 255, 0.06) !important;
         }
+        body.slate-mode .sidebar-squircle-ico.amber { background: rgba(245, 158, 11, 0.16); color: #FBBF24; }
+        body.slate-mode .sidebar-squircle-ico.red { background: rgba(239, 68, 68, 0.16); color: #F87171; }
+        body.slate-mode .sidebar-squircle-ico.green { background: rgba(16, 185, 129, 0.16); color: #34D399; }
+        body.slate-mode .sidebar-squircle-ico.blue { background: rgba(59, 130, 246, 0.16); color: #60A5FA; }
+        body.slate-mode .sidebar-squircle-ico.purple { background: rgba(168, 85, 247, 0.16); color: #C084FC; }
+        body.slate-mode .sidebar-squircle-ico.gray { background: rgba(148, 163, 184, 0.16); color: #CBD5E1; }
+        body.slate-mode .sidebar-squircle-ico.teal { background: rgba(20, 184, 166, 0.16); color: #2DD4BF; }
+        body.slate-mode .sidebar-squircle-ico.amber-install { background: rgba(245, 158, 11, 0.16); color: #FBBF24; }
 
         body.slate-mode .glass-modal-sheet .form-input-control,
         body.slate-mode .wallets-add-input,
@@ -4611,3 +4638,89 @@
             background: rgba(251, 191, 36, 0.16);
             color: #FBBF24;
         }
+
+        /* إصلاح بطاقتي المعادلات في أسفل الشاشة الرئيسية */
+        body.slate-mode .home-eq-mini-card {
+            background: #2E3238 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+        }
+        body.slate-mode .home-eq-line {
+            color: #94A3B8 !important;
+        }
+        body.slate-mode .home-eq-line.is-result {
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
+
+        /* إظهار أيقونات المربعات الأربعة وتحسين شارات القيم و"دين اليوم" */
+        body.slate-mode .ios-tile-icon-box {
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+        body.slate-mode .ios-tile-icon-box svg {
+            stroke: #FFFFFF !important;
+            opacity: 1 !important;
+        }
+        body.slate-mode .ios-tile-icon-box.green { background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; }
+        body.slate-mode .ios-tile-icon-box.red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important; }
+        body.slate-mode .ios-tile-icon-box.blue { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important; }
+        body.slate-mode .ios-tile-icon-box.amber { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important; }
+
+        body.slate-mode .ios-tile-value,
+        body.slate-mode .ios-tile-sub {
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+        body.slate-mode .ios-tile-value.green { color: #34D399 !important; }
+        body.slate-mode .ios-tile-value.red { color: #F87171 !important; }
+        body.slate-mode .ios-tile-sub { color: #93C5FD !important; }
+        body.slate-mode #homeTotalDebtsBanner,
+        body.slate-mode .ios-tile-sub.amber {
+            background: rgba(245, 158, 11, 0.2) !important;
+            color: #FCD34D !important;
+        }
+
+        /* إزالة أي خلفيات بيضاء متبقية في النوافذ المنبثقة وسجل الحركات والأزرار */
+        body.slate-mode .home-day-reset-btn {
+            background: #2E3238 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #60A5FA !important;
+        }
+        body.slate-mode .home-day-reset-btn.is-active {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+            color: #FFFFFF !important;
+        }
+        body.slate-mode .device-id-display-row,
+        body.slate-mode .security-sub-box,
+        body.slate-mode .confirm-dialog-wrapper,
+        body.slate-mode .toast-neon-box {
+            background: #2E3238 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
+        body.slate-mode .security-settings-card,
+        body.slate-mode .security-status-badge.is-disabled,
+        body.slate-mode .type-pill-btn,
+        body.slate-mode .section-income-pill-btn,
+        body.slate-mode .composer-type-pill {
+            background: #343940 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #E2E8F0 !important;
+        }
+        body.slate-mode .device-id-code-txt { color: #60A5FA !important; }
+        body.slate-mode .device-copy-btn,
+        body.slate-mode .security-action-btn.is-change {
+            background: rgba(59, 130, 246, 0.18) !important;
+            color: #93C5FD !important;
+        }
+        body.slate-mode .app-lock-overlay {
+            background: rgba(34, 37, 42, 0.94) !important;
+        }
+        body.slate-mode .subpage-header-nav .back-nav-glass-icon-btn,
+        body.slate-mode .subpage-header-nav .subpage-left-return-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: #93C5FD !important;
+        }
+        body.slate-mode .apple-summary-squircle.green { background: rgba(16, 185, 129, 0.18) !important; color: #34D399 !important; }
+        body.slate-mode .apple-summary-squircle.amber { background: rgba(245, 158, 11, 0.18) !important; color: #FBBF24 !important; }
+        body.slate-mode .apple-summary-squircle.blue { background: rgba(59, 130, 246, 0.18) !important; color: #60A5FA !important; }

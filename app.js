@@ -400,14 +400,19 @@
         closeAllActionMenus();
         if (!wasOpen) {
             targetMenu.classList.add("is-open");
-            const bd = document.getElementById("actionMenuBackdrop");
-            if (bd) bd.classList.add("is-active");
+            const parentCard = wrapper.closest(".unified-tx-card, .stream-record-card");
+            if (parentCard) parentCard.classList.add("has-open-menu");
+            if (!btn.closest(".glass-modal-backdrop")) {
+                const bd = document.getElementById("actionMenuBackdrop");
+                if (bd) bd.classList.add("is-active");
+            }
             openActionDropdownId = txId;
         }
     }
 
     function closeAllActionMenus() {
         document.querySelectorAll(".action-dropdown-menu.is-open").forEach(m => m.classList.remove("is-open"));
+        document.querySelectorAll(".has-open-menu").forEach(c => c.classList.remove("has-open-menu"));
         const bd = document.getElementById("actionMenuBackdrop");
         if (bd) bd.classList.remove("is-active");
         openActionDropdownId = null;
@@ -674,7 +679,9 @@
             if (cpDd && cpDd.classList.contains("is-open") && cpWrap && !cpWrap.contains(e.target)) {
                 cpDd.classList.remove("is-open");
             }
-            if (!e.target.closest(".action-dropdown-wrapper")) closeAllActionMenus();
+            if (!e.target.closest(".action-dropdown-wrapper") && !e.target.closest(".action-menu-item")) {
+                closeAllActionMenus();
+            }
         }
 
         document.addEventListener("click", handleGlobalOutsideClose);
@@ -2810,6 +2817,10 @@
         saveStorage();
         closeGlassModal("addTxModalSheet");
         renderMainState();
+        const catDetailModal = document.getElementById("categoryDetailModal");
+        if (catDetailModal && catDetailModal.classList.contains("is-active-modal")) {
+            renderCategoryDetailModalContent();
+        }
     }
 
     function openClientInvoiceModal(defaultClient = "") {
@@ -2940,6 +2951,10 @@
             displayToast("تم حذف الحركة");
             renderMainState();
             if (!document.getElementById("clientStatementView").classList.contains("is-hidden")) renderClientStatement();
+            const catDetailModal = document.getElementById("categoryDetailModal");
+            if (catDetailModal && catDetailModal.classList.contains("is-active-modal")) {
+                renderCategoryDetailModalContent();
+            }
         });
     }
 
@@ -3048,11 +3063,15 @@
                 pushAppHistoryStep("modal_" + id);
             }
         }
+        el.style.zIndex = String(200 + Math.max(1, openModalOrderStack.length) * 10);
         syncActiveModalViewportHeight();
     }
     function closeGlassModal(id) {
         const el = document.getElementById(id);
-        if (el) el.classList.remove("is-active-modal");
+        if (el) {
+            el.classList.remove("is-active-modal");
+            el.style.zIndex = "";
+        }
         openModalOrderStack = openModalOrderStack.filter(mId => mId !== id);
         if (id === "addTxModalSheet") closeCategoryDropdown();
         if (id === "clientInvoiceModal") closeClientDropdown();
