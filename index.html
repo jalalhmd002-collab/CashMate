@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>إدارة الأموال والمصاريف وديون الزبائن</title>
+    <meta name="theme-color" content="#D97706">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="إدارة الأموال">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F59E0B'/%3E%3Cstop offset='100%25' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3Cpath d='M368 184v-28a36 36 0 0 0-36-36H148a36 36 0 0 0 0 72h220v120a36 36 0 0 1-36 36H148a36 36 0 0 1-36-36V156' fill='none' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='336' cy='256' r='18' fill='%23FFFFFF'/%3E%3C/svg%3E">
+    <link rel="manifest" id="dynamicPwaManifestLink">
     <style>
         @font-face {
           font-family: 'Aljazeera';
@@ -2975,6 +2982,7 @@
             flex-direction: column;
             align-items: flex-end;
             justify-content: space-between;
+            align-self: stretch;
             gap: 6px;
             flex-shrink: 0;
         }
@@ -3277,6 +3285,10 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            color: var(--text-secondary) !important;
         }
         .unified-tx-wallet-plain {
             display: inline-flex;
@@ -4048,6 +4060,144 @@
             border-top-width: 1px !important;
             border-color: rgba(0, 0, 0, 0.06) !important;
         }
+
+        .unified-tx-left-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .unified-tx-left-top-actions .apple-card-squircle {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+        }
+        .unified-tx-left-bottom-amt {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        /* زر تثبيت التطبيق PWA بأسلوب Apple */
+        .pwa-install-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            border: none;
+            color: #FFFFFF;
+            font-size: 0.82rem;
+            font-weight: 700 !important;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25);
+            flex-shrink: 0;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pwa-install-btn.is-visible {
+            display: inline-flex;
+        }
+        .pwa-install-btn:active { transform: scale(0.95); }
+        #pwaInstallSidebarBtn {
+            display: none;
+        }
+        #pwaInstallSidebarBtn.is-visible {
+            display: flex;
+        }
+        .sidebar-squircle-ico.amber-install {
+            background: #FFFBEB;
+            color: #D97706;
+        }
+
+        /* مربعات كبيرة متمركزة (1:1) للمربعات الأربع + بطاقتي المعادلة المتجاورتين */
+        .ios-grid-tile {
+            aspect-ratio: 1 / 1;
+            min-height: 155px !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            padding: 16px 12px !important;
+            border-radius: 24px !important;
+            gap: 10px !important;
+        }
+        .ios-tile-icon-box {
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 16px !important;
+            flex-shrink: 0;
+        }
+        .ios-tile-icon-box svg {
+            width: 28px;
+            height: 28px;
+        }
+        .ios-tile-text-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 0;
+            width: 100%;
+            text-align: center;
+        }
+        .ios-tile-title {
+            font-size: 1.2rem !important;
+            font-weight: 700 !important;
+            line-height: 1.25;
+            white-space: nowrap;
+        }
+        .ios-tile-value {
+            font-size: 1.25rem !important;
+            padding: 4px 14px !important;
+        }
+        .ios-tile-sub {
+            font-size: 1.25rem !important;
+            padding: 4px 14px !important;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .home-equations-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .home-eq-mini-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 12px 13px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .home-eq-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 0.84rem;
+            font-weight: 700 !important;
+            color: var(--text-secondary);
+        }
+        .home-eq-line.is-result {
+            border-top: 1px solid rgba(0, 0, 0, 0.07);
+            padding-top: 7px;
+            margin-top: 2px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        .home-eq-line.is-result .eq-num {
+            font-size: 0.98rem;
+        }
     </style>
 </head>
 <body>
@@ -4102,6 +4252,10 @@
                     <span class="sidebar-squircle-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/></svg></span>
                     <span class="sidebar-hide-on-collapse">الآلة الحاسبة</span>
                 </button>
+                <button type="button" class="sidebar-nav-item" id="pwaInstallSidebarBtn" onclick="triggerPwaInstall(); closeMobileSidebar();" title="تثبيت التطبيق على الجهاز">
+                    <span class="sidebar-squircle-ico amber-install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                    <span class="sidebar-hide-on-collapse">تثبيت التطبيق</span>
+                </button>
                 <button type="button" class="sidebar-nav-item" onclick="openGlassModal('settingsModal'); closeMobileSidebar();" title="الإعدادات والبيانات">
                     <span class="sidebar-squircle-ico gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
                     <span class="sidebar-hide-on-collapse">الإعدادات والبيانات</span>
@@ -4134,7 +4288,10 @@
                     </span>
                     <span class="header-app-title-text" id="headerAppTitleDisplay"></span>
                 </div>
-                <span style="width: 36px; flex-shrink: 0;"></span>
+                <button type="button" class="pwa-install-btn" id="pwaInstallHeaderBtn" onclick="triggerPwaInstall()" title="تثبيت التطبيق">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>تثبيت التطبيق</span>
+                </button>
             </div>
         </header>
 
@@ -4185,41 +4342,72 @@
                         <span class="ios-tile-icon-box green">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
                         </span>
-                        <span class="ios-tile-title" id="homeIncomeTileTitle">دخل اليوم</span>
-                        <span class="ios-tile-value green" id="homeTotalIncomeBanner">0</span>
+                        <span class="ios-tile-text-col">
+                            <span class="ios-tile-title" id="homeIncomeTileTitle">دخل اليوم</span>
+                            <span class="ios-tile-value green" id="homeTotalIncomeBanner">0</span>
+                        </span>
                     </button>
 
                     <button type="button" class="ios-grid-tile is-expense" id="btnNavExpense" onclick="openSectionPage('EXPENSE', false)" title="فتح صفحة المصروفات">
                         <span class="ios-tile-icon-box red">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                         </span>
-                        <span class="ios-tile-title" id="homeExpenseTileTitle">مصروفات اليوم</span>
-                        <span class="ios-tile-value red" id="homeTotalExpenseBanner">0</span>
+                        <span class="ios-tile-text-col">
+                            <span class="ios-tile-title" id="homeExpenseTileTitle">مصروفات اليوم</span>
+                            <span class="ios-tile-value red" id="homeTotalExpenseBanner">0</span>
+                        </span>
                     </button>
 
                     <button type="button" class="ios-grid-tile is-history" id="btnNavHistoryTile" onclick="navigateToHistoryViewWithCategory(null)" title="فتح سجل الحركات المالية">
                         <span class="ios-tile-icon-box blue">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         </span>
-                        <span class="ios-tile-title">سجل الحركات</span>
-                        <span class="ios-tile-sub" id="homeHistoryCountBanner">عرض الكل</span>
+                        <span class="ios-tile-text-col">
+                            <span class="ios-tile-title">سجل الحركات</span>
+                            <span class="ios-tile-sub" id="homeHistoryCountBanner">عرض الكل</span>
+                        </span>
                     </button>
 
                     <button type="button" class="ios-grid-tile is-clients" id="btnNavClients" onclick="openSectionPage('CLIENTS', false)" title="فتح صفحة الزبائن والذمم">
                         <span class="ios-tile-icon-box amber">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                         </span>
-                        <span class="ios-tile-title">الزبائن</span>
-                        <span class="ios-tile-sub amber" id="homeTotalDebtsBanner" style="color: var(--neon-amber);">0 دين اليوم</span>
+                        <span class="ios-tile-text-col">
+                            <span class="ios-tile-title">الزبائن</span>
+                            <span class="ios-tile-sub amber" id="homeTotalDebtsBanner" style="color: var(--neon-amber);">0 دين اليوم</span>
+                        </span>
                     </button>
                 </div>
 
-                <div class="home-equation-card" id="homeDailyEquationCard">
-                    <div class="home-equation-row has-divider" id="homeEquationLine1">
-                        <span><span id="eqLblSales">المبيعات</span> (<span class="eq-num blue" id="eqTodaySales">0</span>) = <span id="eqLblInc1">الدخل</span> (<span class="eq-num green" id="eqTodayIncome1">0</span>) + <span id="eqLblDebt">الدين</span> (<span class="eq-num amber" id="eqTodayDebt">0</span>)</span>
+                <div class="home-equations-grid" id="homeDailyEquationCard">
+                    <div class="home-eq-mini-card">
+                        <div class="home-eq-line">
+                            <span>الدخل:</span>
+                            <span class="eq-num green" id="eqTodayIncome1">0</span>
+                        </div>
+                        <div class="home-eq-line">
+                            <span>+ الدين:</span>
+                            <span class="eq-num amber" id="eqTodayDebt">0</span>
+                        </div>
+                        <div class="home-eq-line is-result">
+                            <span>= المبيعات:</span>
+                            <span class="eq-num blue" id="eqTodaySales">0</span>
+                        </div>
                     </div>
-                    <div class="home-equation-row" id="homeEquationLine2">
-                        <span><span id="eqLblInc2">الدخل</span> (<span class="eq-num green" id="eqTodayIncome2">0</span>) − <span id="eqLblExp">المصروف</span> (<span class="eq-num red" id="eqTodayExpense">0</span>) = <span id="eqLblNet">الصافي</span> (<span class="eq-num green" id="eqTodayNet">0</span>)</span>
+
+                    <div class="home-eq-mini-card">
+                        <div class="home-eq-line">
+                            <span>الدخل:</span>
+                            <span class="eq-num green" id="eqTodayIncome2">0</span>
+                        </div>
+                        <div class="home-eq-line">
+                            <span>− المصروفات:</span>
+                            <span class="eq-num red" id="eqTodayExpense">0</span>
+                        </div>
+                        <div class="home-eq-line is-result">
+                            <span>= الصافي:</span>
+                            <span class="eq-num green" id="eqTodayNet">0</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4910,6 +5098,22 @@
             </div>
             <button type="button" class="commit-glass-btn" style="margin-top:6px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%);" onclick="applyHomeCustomRange()">عرض الفترة المختارة</button>
         </div>
+    </div>
+</div>
+
+<!-- Modal: تلميح تثبيت التطبيق على أجهزة iOS -->
+<div class="glass-modal-backdrop" id="iosInstallHintModal" onclick="closeGlassModal('iosInstallHintModal')">
+    <div class="confirm-dialog-wrapper" onclick="event.stopPropagation()" style="max-width: 370px;">
+        <div style="width: 48px; height: 48px; border-radius: 14px; background: #FFFBEB; border: 1px solid #FDE68A; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: #D97706;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </div>
+        <div class="confirm-dialog-title">تثبيت التطبيق على الآيفون والآيباد</div>
+        <div class="confirm-dialog-msg" style="margin-bottom: 16px;">
+            اضغط على زر <strong>المشاركة (Share)</strong> في شريط المتصفح، ثم اختر<br>
+            <strong>«إضافة إلى الشاشة الرئيسية» (Add to Home Screen)</strong><br>
+            ليعمل البرنامج كتطبيق مستقل بملء الشاشة.
+        </div>
+        <button type="button" class="commit-glass-btn" style="margin-top:0; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);" onclick="closeGlassModal('iosInstallHintModal')">حسناً، فهمت</button>
     </div>
 </div>
 
@@ -5927,7 +6131,6 @@
             const noteTxt = tx.note ? escapeHTML(tx.note) : escapeHTML(tx.category || '');
             row.innerHTML = `
                 <div class="unified-tx-card-main">
-                    ${getCardSquircleIconHtml(stateCls)}
                     <div class="unified-tx-right">
                         <div class="unified-tx-row1">
                             <span class="unified-tx-title">${noteTxt}</span>
@@ -5939,26 +6142,29 @@
                     </div>
                 </div>
                 <div class="unified-tx-left-wrap">
-                    <div class="action-dropdown-wrapper">
-                        <button type="button" class="three-dots-btn" data-id="${tx.id}" onclick="toggleActionMenu(event, this.getAttribute('data-id'))" title="خيارات التعديل والحذف">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <circle cx="12" cy="5" r="2.2"/>
-                                <circle cx="12" cy="12" r="2.2"/>
-                                <circle cx="12" cy="19" r="2.2"/>
-                            </svg>
-                        </button>
-                        <div class="action-dropdown-menu" id="actionMenu_detail_${tx.id}">
-                            <button type="button" class="action-menu-item edit-item" data-id="${tx.id}" onclick="onActionMenuEdit(this.getAttribute('data-id'))">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                <span>تعديل</span>
+                    <div class="unified-tx-left-top-actions">
+                        ${getCardSquircleIconHtml(stateCls)}
+                        <div class="action-dropdown-wrapper">
+                            <button type="button" class="three-dots-btn" data-id="${tx.id}" onclick="toggleActionMenu(event, this.getAttribute('data-id'))" title="خيارات التعديل والحذف">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="5" r="2.2"/>
+                                    <circle cx="12" cy="12" r="2.2"/>
+                                    <circle cx="12" cy="19" r="2.2"/>
+                                </svg>
                             </button>
-                            <button type="button" class="action-menu-item del-item" data-id="${tx.id}" onclick="onActionMenuDelete(this.getAttribute('data-id'))">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                                <span>حذف</span>
-                            </button>
+                            <div class="action-dropdown-menu" id="actionMenu_detail_${tx.id}">
+                                <button type="button" class="action-menu-item edit-item" data-id="${tx.id}" onclick="onActionMenuEdit(this.getAttribute('data-id'))">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    <span>تعديل</span>
+                                </button>
+                                <button type="button" class="action-menu-item del-item" data-id="${tx.id}" onclick="onActionMenuDelete(this.getAttribute('data-id'))">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    <span>حذف</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="unified-tx-left">
+                    <div class="unified-tx-left-bottom-amt">
                         <div class="unified-tx-paid ${isInc ? 'green' : 'red'}">
                             ${isInc ? '+' : '-'}${Number(tx.amount || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}
                         </div>
@@ -6711,7 +6917,6 @@
 
             card.innerHTML = `
                 <div class="unified-tx-card-main">
-                ${getCardSquircleIconHtml(isPay ? "is-payment" : "is-invoice")}
                 <div class="unified-tx-right">
                     <div class="unified-tx-row1">
                         <span class="unified-tx-title">${escapeHTML(t.client || "")}</span>
@@ -7066,7 +7271,6 @@
 
             row.innerHTML = `
                 <div class="unified-tx-card-main">
-                ${getCardSquircleIconHtml(cardStateCls)}
                 <div class="unified-tx-right">
                     <div class="unified-tx-row1">${row1Html}</div>
                     <div class="unified-tx-row2">${row2Html}</div>
@@ -7074,6 +7278,8 @@
                 </div>
                 </div>
                 <div class="unified-tx-left-wrap">
+                    <div class="unified-tx-left-top-actions">
+                    ${!isClient ? getCardSquircleIconHtml(cardStateCls) : ''}
                     <div class="action-dropdown-wrapper">
                         <button type="button" class="three-dots-btn" data-id="${tx.id}" onclick="toggleActionMenu(event, this.getAttribute('data-id'))" title="خيارات التعديل والحذف">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -7093,7 +7299,8 @@
                             </button>
                         </div>
                     </div>
-                    <div class="unified-tx-left">
+                    </div>
+                    <div class="${isClient ? 'unified-tx-left' : 'unified-tx-left-bottom-amt'}">
                         ${leftAmountHtml}
                     </div>
                 </div>
@@ -7988,6 +8195,121 @@
         }
     });
 
+    // =========================================================================
+    // تهيئة تطبيق الويب التقدمي (PWA) داخل الملف الواحد (Manifest + SW + Install)
+    // =========================================================================
+    let deferredPwaPrompt = null;
+
+    function setupSingleFilePWA() {
+        // 1. توليد وربط ملف Web App Manifest ديناميكياً عبر Blob URL
+        try {
+            const iconUri = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F59E0B'/%3E%3Cstop offset='100%25' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3Cpath d='M368 184v-28a36 36 0 0 0-36-36H148a36 36 0 0 0 0 72h220v120a36 36 0 0 1-36 36H148a36 36 0 0 1-36-36V156' fill='none' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='336' cy='256' r='18' fill='%23FFFFFF'/%3E%3C/svg%3E";
+            const manifestObj = {
+                name: "إدارة الأموال والمصاريف",
+                short_name: "إدارة الأموال",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#F5F5F7",
+                theme_color: "#D97706",
+                orientation: "portrait",
+                icons: [
+                    { src: iconUri, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+                    { src: iconUri, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: "application/manifest+json" });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const manifestLink = document.getElementById("dynamicPwaManifestLink");
+            if (manifestLink) manifestLink.setAttribute("href", manifestUrl);
+        } catch (e) {}
+
+        // 2. تسجيل Service Worker مدمج عبر Blob URL للعمل دون إنترنت
+        if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+            try {
+                const swCode = `
+                    const CACHE_NAME = "finances-pwa-cache-v1";
+                    self.addEventListener("install", (event) => {
+                        self.skipWaiting();
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll([self.registration.scope]).catch(() => {});
+                            })
+                        );
+                    });
+                    self.addEventListener("activate", (event) => {
+                        event.waitUntil(
+                            caches.keys().then((keys) => Promise.all(
+                                keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+                            )).then(() => self.clients.claim())
+                        );
+                    });
+                    self.addEventListener("fetch", (event) => {
+                        if (event.request.method !== "GET") return;
+                        const reqUrl = event.request.url || "";
+                        if (!reqUrl.startsWith("http")) return;
+                        event.respondWith(
+                            fetch(event.request).then((res) => {
+                                if (res && res.ok) {
+                                    const copy = res.clone();
+                                    caches.open(CACHE_NAME).then((c) => c.put(event.request, copy)).catch(() => {});
+                                }
+                                return res;
+                            }).catch(() => {
+                                return caches.match(event.request).then((cached) => cached || caches.match(self.registration.scope));
+                            })
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: "application/javascript" });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            } catch (e) {}
+        }
+
+        // 3. إظهار زر التثبيت الذكي لـ Android / Chrome أو تلميح iOS
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        if (!isStandalone && isIOSDevice) {
+            setPwaInstallButtonsVisible(true);
+        }
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            if (!isStandalone) setPwaInstallButtonsVisible(true);
+        });
+
+        window.addEventListener("appinstalled", () => {
+            deferredPwaPrompt = null;
+            setPwaInstallButtonsVisible(false);
+            displayToast("تم تثبيت التطبيق على جهازك بنجاح");
+        });
+    }
+
+    function setPwaInstallButtonsVisible(show) {
+        const headerBtn = document.getElementById("pwaInstallHeaderBtn");
+        const sideBtn = document.getElementById("pwaInstallSidebarBtn");
+        if (headerBtn) headerBtn.classList.toggle("is-visible", show);
+        if (sideBtn) sideBtn.classList.toggle("is-visible", show);
+    }
+
+    function triggerPwaInstall() {
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (deferredPwaPrompt) {
+            deferredPwaPrompt.prompt();
+            deferredPwaPrompt.userChoice.then((choice) => {
+                if (choice && choice.outcome === "accepted") {
+                    setPwaInstallButtonsVisible(false);
+                }
+                deferredPwaPrompt = null;
+            }).catch(() => {});
+        } else if (isIOSDevice) {
+            openGlassModal("iosInstallHintModal");
+        }
+    }
+
+    setupSingleFilePWA();
     window.onload = initApplication;
 </script>
 <div id="actionMenuBackdrop" class="action-menu-backdrop" onclick="closeAllActionMenus()"></div>
