@@ -4638,11 +4638,11 @@
             <!-- 3. شاشة كشف حساب زبون تفصيلي -->
             <div class="subpage-view-panel is-hidden" id="clientStatementView">
                 <div class="subpage-header-nav">
-                    <button class="back-nav-glass-icon-btn" onclick="handleTopNavSelect('CLIENTS')" title="رجوع للزبائن">
+                    <button class="back-nav-glass-icon-btn" onclick="openSectionPage('CLIENTS', false, false)" title="رجوع للزبائن">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                     <span class="subpage-header-title">كشف حساب زبون</span>
-                    <button type="button" class="subpage-left-return-btn" onclick="handleTopNavSelect('CLIENTS')" title="عودة للزبائن"><span>عودة</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" class="subpage-left-return-btn" onclick="openSectionPage('CLIENTS', false, false)" title="عودة للزبائن"><span>عودة</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                 </div>
 
                 <div class="client-statement-header-card">
@@ -5198,6 +5198,7 @@
         const bd = document.getElementById("sidebarBackdropMobile");
         if (sidebar) sidebar.classList.add("is-mobile-open");
         if (bd) bd.classList.add("is-visible");
+        pushAppHistoryStep("mobile_sidebar");
     }
 
     function closeMobileSidebar() {
@@ -5773,9 +5774,12 @@
         renderMainState();
     }
 
-    function openSectionPage(key, openModalOnEnter = false) {
+    function openSectionPage(key, openModalOnEnter = false, pushHistory = true) {
         currentMainType = key;
         if (key !== 'CLIENTS') clientsSubFilter = 'ALL';
+        if (pushHistory && !isNavigatingViaPopstate) {
+            pushAppHistoryStep("section_" + key);
+        }
 
         document.querySelectorAll('.subpage-view-panel').forEach(p => p.classList.add('is-hidden'));
         if (key === "CLIENTS") {
@@ -5818,96 +5822,147 @@
     }
 
     let allowAppExit = false;
+    let isNavigatingViaPopstate = false;
+    let openModalOrderStack = [];
+
+    function pushAppHistoryStep(stepName) {
+        if (allowAppExit) return;
+        try {
+            window.history.pushState({ appStep: stepName || "step", t: Date.now() }, "", "#app");
+        } catch(e) {
+            try { window.location.hash = "#app"; } catch(e2) {}
+        }
+    }
 
     function ensureHashLock() {
         if (allowAppExit) return;
-        if (window.location.hash !== '#app') {
-            try { window.history.pushState({ page: 'app_view' }, '', '#app'); }
-            catch(e) { window.location.hash = '#app'; }
+        if (window.location.hash !== "#app" || !window.history.state || !window.history.state.appStep) {
+            try {
+                window.history.pushState({ appStep: "app_lock", t: Date.now() }, "", "#app");
+            } catch(e) {
+                try { window.location.hash = "#app"; } catch(e2) {}
+            }
         }
     }
 
     function setupPopstateGuard() {
         try {
-            if (window.location.hash !== '#app') {
-                window.history.replaceState({ page: 'root' }, '', window.location.href.split('#')[0]);
-                window.history.pushState({ page: 'app_view' }, '', '#app');
-            }
+            const baseUrl = window.location.href.split("#")[0];
+            window.history.replaceState({ page: "root" }, "", baseUrl);
+            window.history.pushState({ page: "app_view", appStep: "home", t: Date.now() }, "", "#app");
         } catch(e) {}
 
-        window.addEventListener('touchstart', ensureHashLock, { passive: true });
-        window.addEventListener('pointerdown', ensureHashLock, { passive: true });
-        window.addEventListener('click', ensureHashLock);
+        const initTouchGuard = function() { ensureHashLock(); };
+        window.addEventListener("touchstart", initTouchGuard, { passive: true, once: true });
+        window.addEventListener("pointerdown", initTouchGuard, { passive: true, once: true });
+        window.addEventListener("click", initTouchGuard, { once: true });
 
         let lastBackHandledTime = 0;
 
         function handleBackNavigation() {
             if (allowAppExit) return;
             const now = Date.now();
-            if (now - lastBackHandledTime < 250) return;
+            if (now - lastBackHandledTime < 180) return;
             lastBackHandledTime = now;
-            setTimeout(ensureHashLock, 10);
 
-            const sb = document.getElementById("appSidebar");
-            if (sb && sb.classList.contains("is-mobile-open")) {
-                closeMobileSidebar();
-                return;
-            }
-            const stmtMenu = document.getElementById("statementActionDropdownMenu");
-            if (stmtMenu && stmtMenu.classList.contains("is-open")) {
-                stmtMenu.classList.remove("is-open");
-                return;
-            }
-            if (document.querySelectorAll(".action-dropdown-menu.is-open").length > 0) {
-                closeAllActionMenus();
-                return;
-            }
-            const catPanel = document.getElementById("categoryDropdownPanel");
-            if (catPanel && catPanel.style.display === "block") {
-                closeCategoryDropdown();
-                return;
-            }
-            const clientPanel = document.getElementById("clientDropdownPanel");
-            if (clientPanel && clientPanel.style.display === "block") {
-                closeClientDropdown();
-                return;
-            }
-            const exitModal = document.getElementById('exitAppConfirmModal');
-            if (exitModal && exitModal.classList.contains('is-active-modal')) {
-                closeGlassModal('exitAppConfirmModal');
-                return;
-            }
-            const activeModals = document.querySelectorAll('.glass-modal-backdrop.is-active-modal');
-            if (activeModals.length > 0) {
-                activeModals.forEach(m => m.classList.remove('is-active-modal'));
-                closeCategoryDropdown();
-                closeClientDropdown();
-                closeAllActionMenus();
-                return;
-            }
-            const stmtView = document.getElementById('clientStatementView');
-            if (stmtView && !stmtView.classList.contains('is-hidden')) {
-                handleTopNavSelect('CLIENTS');
-                return;
-            }
-            const historyView = document.getElementById('reportsHistoryView');
-            if (historyView && !historyView.classList.contains('is-hidden')) {
-                navigateBackFromHistoryView();
-                return;
-            }
-            for (const vId of ['clientsFullView', 'expenseFullView', 'incomeFullView']) {
-                const vEl = document.getElementById(vId);
-                if (vEl && !vEl.classList.contains('is-hidden')) {
-                    navigateToHomeView();
+            isNavigatingViaPopstate = true;
+            try {
+                // أولاً: إغلاق أي قائمة منسدلة مفتوحة أو القائمة الجانبية للهاتف
+                const sb = document.getElementById("appSidebar");
+                if (sb && sb.classList.contains("is-mobile-open")) {
+                    closeMobileSidebar();
                     return;
                 }
+                const stmtMenu = document.getElementById("statementActionDropdownMenu");
+                if (stmtMenu && stmtMenu.classList.contains("is-open")) {
+                    stmtMenu.classList.remove("is-open");
+                    return;
+                }
+                if (document.querySelectorAll(".action-dropdown-menu.is-open").length > 0) {
+                    closeAllActionMenus();
+                    return;
+                }
+                const catPanel = document.getElementById("categoryDropdownPanel");
+                if (catPanel && catPanel.style.display === "block") {
+                    closeCategoryDropdown();
+                    return;
+                }
+                const clientPanel = document.getElementById("clientDropdownPanel");
+                if (clientPanel && clientPanel.style.display === "block") {
+                    closeClientDropdown();
+                    return;
+                }
+                const cpDd = document.getElementById("clientsPageSearchDropdown");
+                if (cpDd && cpDd.classList.contains("is-open")) {
+                    cpDd.classList.remove("is-open");
+                    return;
+                }
+
+                // سابعاً: إذا كانت نافذة تأكيد الخروج مفتوحة أصلاً -> أغلقها وأبقِ المستخدم في البرنامج
+                const exitModal = document.getElementById("exitAppConfirmModal");
+                if (exitModal && exitModal.classList.contains("is-active-modal")) {
+                    closeGlassModal("exitAppConfirmModal");
+                    ensureHashLock();
+                    return;
+                }
+
+                // ثانياً: إغلاق أحدث نافذة منبثقة مفتوحة فقط (باستثناء نافذة تأكيد الخروج)
+                const activeModals = Array.from(document.querySelectorAll(".glass-modal-backdrop.is-active-modal"))
+                    .filter(m => m.id !== "exitAppConfirmModal");
+                if (activeModals.length > 0) {
+                    let topModalId = null;
+                    while (openModalOrderStack.length > 0) {
+                        const cand = openModalOrderStack.pop();
+                        const candEl = document.getElementById(cand);
+                        if (candEl && candEl.classList.contains("is-active-modal") && cand !== "exitAppConfirmModal") {
+                            topModalId = cand;
+                            break;
+                        }
+                    }
+                    if (!topModalId) {
+                        topModalId = activeModals[activeModals.length - 1].id;
+                    }
+                    closeGlassModal(topModalId);
+                    closeCategoryDropdown();
+                    closeClientDropdown();
+                    closeAllActionMenus();
+                    return;
+                }
+
+                // ثالثاً: من كشف حساب زبون -> العودة إلى صفحة الزبائن
+                const stmtView = document.getElementById("clientStatementView");
+                if (stmtView && !stmtView.classList.contains("is-hidden")) {
+                    openSectionPage("CLIENTS", false, false);
+                    return;
+                }
+
+                // رابعاً: من سجل الحركات -> العودة إلى الصفحة السابقة
+                const historyView = document.getElementById("reportsHistoryView");
+                if (historyView && !historyView.classList.contains("is-hidden")) {
+                    navigateBackFromHistoryView();
+                    return;
+                }
+
+                // خامساً: من أي صفحة رئيسية فرعية -> العودة إلى الشاشة الرئيسية
+                for (const vId of ["clientsFullView", "expenseFullView", "incomeFullView"]) {
+                    const vEl = document.getElementById(vId);
+                    if (vEl && !vEl.classList.contains("is-hidden")) {
+                        navigateToHomeView();
+                        return;
+                    }
+                }
+
+                // سادساً: في الشاشة الرئيسية بدون أي نوافذ مفتوحة -> إظهار تحذير الخروج وإعادة حقن #app
+                openGlassModal("exitAppConfirmModal");
+                pushAppHistoryStep("exit_confirm");
+            } finally {
+                isNavigatingViaPopstate = false;
+                setTimeout(ensureHashLock, 15);
             }
-            openGlassModal('exitAppConfirmModal');
         }
 
-        window.addEventListener('popstate', handleBackNavigation);
-        window.addEventListener('hashchange', handleBackNavigation);
-        window.addEventListener('beforeunload', function() {
+        window.addEventListener("popstate", handleBackNavigation);
+        window.addEventListener("beforeunload", function() {
             if (!allowAppExit) autoSaveAllState();
         });
     }
@@ -6217,6 +6272,9 @@
         else if (cliEl && !cliEl.classList.contains('is-hidden')) previousPage = 'clients';
         else if (!histEl || histEl.classList.contains('is-hidden')) previousPage = 'home';
 
+        if (!isNavigatingViaPopstate) {
+            pushAppHistoryStep("history");
+        }
         selectedHistoryCategory = cat;
         document.querySelectorAll('.subpage-view-panel').forEach(p => p.classList.add('is-hidden'));
         document.getElementById('reportsHistoryView').classList.remove('is-hidden');
@@ -6226,14 +6284,17 @@
 
     function navigateBackFromHistoryView() {
         selectedHistoryCategory = null;
-        if (previousPage === 'expenses') openSectionPage('EXPENSE', false);
-        else if (previousPage === 'income') openSectionPage('INCOME', false);
-        else if (previousPage === 'clients') openSectionPage('CLIENTS', false);
+        if (previousPage === 'expenses') openSectionPage('EXPENSE', false, false);
+        else if (previousPage === 'income') openSectionPage('INCOME', false, false);
+        else if (previousPage === 'clients') openSectionPage('CLIENTS', false, false);
         else navigateToHomeView();
     }
 
     function navigateToClientStatement(clientName) {
         activeStatementClient = clientName;
+        if (!isNavigatingViaPopstate) {
+            pushAppHistoryStep("client_statement");
+        }
         document.querySelectorAll('.subpage-view-panel').forEach(p => p.classList.add('is-hidden'));
         document.getElementById('clientStatementView').classList.remove('is-hidden');
         syncSidebarActiveItem("sideNavClients");
@@ -8006,11 +8067,21 @@
     function openGlassModal(id) {
         const el = document.getElementById(id);
         if (!el) return;
+        const alreadyOpen = el.classList.contains("is-active-modal");
         el.classList.add("is-active-modal");
+        if (!alreadyOpen && id !== "exitAppConfirmModal") {
+            openModalOrderStack = openModalOrderStack.filter(mId => mId !== id);
+            openModalOrderStack.push(id);
+            if (!isNavigatingViaPopstate) {
+                pushAppHistoryStep("modal_" + id);
+            }
+        }
         syncActiveModalViewportHeight();
     }
     function closeGlassModal(id) {
-        document.getElementById(id).classList.remove("is-active-modal");
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("is-active-modal");
+        openModalOrderStack = openModalOrderStack.filter(mId => mId !== id);
         if (id === "addTxModalSheet") closeCategoryDropdown();
         if (id === "clientInvoiceModal") closeClientDropdown();
         closeAllActionMenus();
