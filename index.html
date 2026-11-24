@@ -3065,18 +3065,18 @@
         .ios-dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 8px;
         }
         .ios-grid-tile {
             border-radius: 24px;
-            padding: 18px 14px;
-            min-height: 156px;
+            padding: 12px 12px;
+            min-height: 128px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 9px;
+            gap: 6px;
             text-align: center;
             cursor: pointer;
             box-shadow: 0 4px 16px rgba(17, 24, 39, 0.05);
@@ -3827,13 +3827,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            font-size: 0.88rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            gap: 4px;
+            font-size: clamp(0.75rem, 3.2vw, 0.95rem);
             font-weight: 700 !important;
             color: var(--text-main);
             text-align: center;
-            line-height: 1.65;
+            line-height: 1.5;
+            overflow: hidden;
         }
         .home-equation-row.has-divider {
             border-bottom: 1px solid rgba(0, 0, 0, 0.07);
@@ -4214,10 +4216,10 @@
 
                 <div class="home-equation-card" id="homeDailyEquationCard">
                     <div class="home-equation-row has-divider" id="homeEquationLine1">
-                        <span><span id="eqLblSales">مبيعات اليوم</span> (<span class="eq-num blue" id="eqTodaySales">0</span>) = <span id="eqLblInc1">دخل اليوم</span> (<span class="eq-num green" id="eqTodayIncome1">0</span>) + <span id="eqLblDebt">دين اليوم</span> (<span class="eq-num amber" id="eqTodayDebt">0</span>)</span>
+                        <span><span id="eqLblSales">المبيعات</span> (<span class="eq-num blue" id="eqTodaySales">0</span>) = <span id="eqLblInc1">الدخل</span> (<span class="eq-num green" id="eqTodayIncome1">0</span>) + <span id="eqLblDebt">الدين</span> (<span class="eq-num amber" id="eqTodayDebt">0</span>)</span>
                     </div>
                     <div class="home-equation-row" id="homeEquationLine2">
-                        <span><span id="eqLblInc2">دخل اليوم</span> (<span class="eq-num green" id="eqTodayIncome2">0</span>) − <span id="eqLblExp">مصروفات اليوم</span> (<span class="eq-num red" id="eqTodayExpense">0</span>) = <span id="eqLblNet">صافي اليوم</span> (<span class="eq-num green" id="eqTodayNet">0</span>)</span>
+                        <span><span id="eqLblInc2">الدخل</span> (<span class="eq-num green" id="eqTodayIncome2">0</span>) − <span id="eqLblExp">المصروف</span> (<span class="eq-num red" id="eqTodayExpense">0</span>) = <span id="eqLblNet">الصافي</span> (<span class="eq-num green" id="eqTodayNet">0</span>)</span>
                     </div>
                 </div>
             </div>
@@ -6563,18 +6565,7 @@
         if (incTileTitleEl) incTileTitleEl.innerText = `دخل ${periodWord}`;
         if (expTileTitleEl) expTileTitleEl.innerText = `مصروفات ${periodWord}`;
 
-        const eqLblMap = {
-            eqLblSales: `مبيعات ${periodWord}`,
-            eqLblInc1: `دخل ${periodWord}`,
-            eqLblDebt: `دين ${periodWord}`,
-            eqLblInc2: `دخل ${periodWord}`,
-            eqLblExp: `مصروفات ${periodWord}`,
-            eqLblNet: `صافي ${periodWord}`
-        };
-        for (const [id, txt] of Object.entries(eqLblMap)) {
-            const el = document.getElementById(id);
-            if (el) el.innerText = txt;
-        }
+
 
         const histTileSubEl = document.getElementById("homeHistoryCountBanner");
         if (histTileSubEl) {
