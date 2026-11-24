@@ -4198,6 +4198,26 @@
         .home-eq-line.is-result .eq-num {
             font-size: 0.98rem;
         }
+
+        /* تثبيت جميع النوافذ المنبثقة في أعلى الشاشة للتوافق مع كيبورد الهاتف */
+        .glass-modal-backdrop {
+            align-items: flex-start !important;
+            padding: max(14px, env(safe-area-inset-top, 14px)) 12px 16px 12px !important;
+        }
+        .glass-modal-sheet,
+        .confirm-dialog-wrapper {
+            margin: 0 auto !important;
+            max-height: calc(100vh - 28px);
+            max-height: calc(100dvh - 28px);
+            animation: modalTopSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .confirm-dialog-wrapper {
+            overflow-y: auto;
+        }
+        @keyframes modalTopSlide {
+            from { opacity: 0; transform: translateY(-12px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -7953,7 +7973,42 @@
         if (typeof cb === "function") cb();
     }
 
-    function openGlassModal(id) { document.getElementById(id).classList.add("is-active-modal"); }
+    function syncActiveModalViewportHeight() {
+        const vh = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+        const maxH = Math.max(220, Math.floor(vh - 24)) + "px";
+        document.querySelectorAll(".glass-modal-backdrop.is-active-modal .glass-modal-sheet, .glass-modal-backdrop.is-active-modal .confirm-dialog-wrapper").forEach(el => {
+            el.style.maxHeight = maxH;
+        });
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", () => {
+            syncActiveModalViewportHeight();
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.closest && activeEl.closest(".glass-modal-sheet")) {
+                setTimeout(() => {
+                    try { activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch(e) {}
+                }, 60);
+            }
+        });
+    }
+
+    document.addEventListener("focusin", (e) => {
+        const el = e.target;
+        if (el && el.closest && el.closest(".glass-modal-sheet") && (el.tagName === "INPUT" || el.tagName === "SELECT" || el.tagName === "TEXTAREA")) {
+            setTimeout(() => {
+                syncActiveModalViewportHeight();
+                try { el.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch(err) {}
+            }, 120);
+        }
+    });
+
+    function openGlassModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add("is-active-modal");
+        syncActiveModalViewportHeight();
+    }
     function closeGlassModal(id) {
         document.getElementById(id).classList.remove("is-active-modal");
         if (id === "addTxModalSheet") closeCategoryDropdown();
