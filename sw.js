@@ -1,4 +1,4 @@
-const CACHE_NAME = "cashmate-v1";
+const CACHE_NAME = "cashmate-v2";
 
 const CORE_ASSETS = [
   "./",
@@ -7,7 +7,9 @@ const CORE_ASSETS = [
   "./firebase-sync.js",
   "./app.js",
   "./manifest.json",
-  "./icon-cashmate.svg"
+  "./icon-cashmate.svg",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
