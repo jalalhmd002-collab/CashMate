@@ -4374,3 +4374,240 @@
         }
         .accessories-launch-btn:active { transform: scale(0.98); }
         .sidebar-squircle-ico.teal { background: #F0FDFA; color: #0D9488; }
+        .sidebar-squircle-ico.slate-theme { background: #EEF2FF; color: #475569; }
+
+        /* =========================================================
+           الوضع السكني الليلي الهادئ (Soft Slate Grey Mode)
+           ========================================================= */
+        body.slate-mode {
+            --bg-deep: #22252A;
+            --bg-sidebar: #26292E;
+            --bg-card: #2E3238;
+            --bg-elevated: #343940;
+            --bg-card-subtle: #343940;
+            --border-glass-base: rgba(255, 255, 255, 0.08);
+            --border-glass-strong: rgba(255, 255, 255, 0.14);
+            --header-glass-bg: rgba(38, 41, 46, 0.92);
+
+            --text-main: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #94A3B8;
+
+            --input-bg: #343940;
+            --input-border: rgba(255, 255, 255, 0.08);
+
+            --neon-green: #34D399;
+            --neon-green-light: #6EE7B7;
+            --neon-green-subtle: rgba(16, 185, 129, 0.14);
+            --neon-green-border: rgba(52, 211, 153, 0.25);
+
+            --neon-red: #F87171;
+            --neon-red-light: #FCA5A5;
+            --neon-red-subtle: rgba(239, 68, 68, 0.14);
+            --neon-red-border: rgba(248, 113, 113, 0.25);
+
+            --neon-blue: #60A5FA;
+            --neon-blue-light: #93C5FD;
+            --neon-blue-subtle: rgba(59, 130, 246, 0.14);
+            --neon-blue-border: rgba(96, 165, 250, 0.25);
+
+            --neon-amber: #FBBF24;
+            --neon-amber-light: #FCD34D;
+            --neon-amber-subtle: rgba(245, 158, 11, 0.14);
+            --neon-amber-border: rgba(251, 191, 36, 0.25);
+
+            color: #F1F5F9 !important;
+        }
+
+        body.slate-mode,
+        body.slate-mode .app-claude-shell,
+        body.slate-mode .phone-mockup-frame {
+            background-color: #22252A !important;
+            color: #F1F5F9 !important;
+        }
+
+        body.slate-mode .claude-sidebar {
+            background: rgba(38, 41, 46, 0.96) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        body.slate-mode header {
+            background: rgba(38, 41, 46, 0.9) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        body.slate-mode .header-app-title-text,
+        body.slate-mode .subpage-header-title,
+        body.slate-mode .sidebar-brand-title,
+        body.slate-mode .sidebar-footer-val,
+        body.slate-mode .home-equation-row,
+        body.slate-mode .ios-tile-title,
+        body.slate-mode .client-statement-name {
+            color: #F1F5F9 !important;
+        }
+
+        body.slate-mode .sidebar-section-label,
+        body.slate-mode .sidebar-footer-lbl,
+        body.slate-mode .home-overview-title,
+        body.slate-mode .ios-tile-caption,
+        body.slate-mode .kpi-sub-label,
+        body.slate-mode .kpi-income-title {
+            color: #94A3B8 !important;
+        }
+
+        body.slate-mode .sidebar-nav-list,
+        body.slate-mode .sidebar-footer-card,
+        body.slate-mode .home-top-overview-card,
+        body.slate-mode .home-equation-card,
+        body.slate-mode .home-summary-footer-card,
+        body.slate-mode .unified-tx-card,
+        body.slate-mode .category-glass-card,
+        body.slate-mode .statement-unit-card,
+        body.slate-mode .stream-record-card,
+        body.slate-mode .subpage-header-nav,
+        body.slate-mode .date-stepper-glass,
+        body.slate-mode .history-custom-range-bar,
+        body.slate-mode .client-statement-header-card,
+        body.slate-mode .client-trio-metrics,
+        body.slate-mode .glass-modal-sheet,
+        body.slate-mode .custom-dropdown-panel,
+        body.slate-mode .clients-page-dropdown,
+        body.slate-mode .action-dropdown-menu,
+        body.slate-mode .statement-dropdown-menu,
+        body.slate-mode .section-calc-quick-btn,
+        body.slate-mode .accessories-launch-btn,
+        body.slate-mode .glass-wallet-chip,
+        body.slate-mode .app-lock-card {
+            background: #2E3238 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22) !important;
+        }
+
+        body.slate-mode .home-overview-col + .home-overview-col,
+        body.slate-mode .home-equation-row.has-divider,
+        body.slate-mode .home-summary-row.has-divider {
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        body.slate-mode .sidebar-nav-item {
+            color: #E2E8F0 !important;
+        }
+        body.slate-mode .sidebar-nav-item:hover {
+            background: #343940 !important;
+        }
+        body.slate-mode .sidebar-nav-item.is-active {
+            background: rgba(59, 130, 246, 0.16) !important;
+            color: #93C5FD !important;
+        }
+        body.slate-mode .sidebar-nav-item + .sidebar-nav-item::before {
+            background: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body.slate-mode .glass-modal-sheet .form-input-control,
+        body.slate-mode .wallets-add-input,
+        body.slate-mode .history-range-input,
+        body.slate-mode .history-search-input,
+        body.slate-mode .clients-page-search-input,
+        body.slate-mode .date-arrow-svg-btn,
+        body.slate-mode .mobile-menu-trigger-btn,
+        body.slate-mode .back-nav-glass-icon-btn,
+        body.slate-mode .subpage-left-return-btn,
+        body.slate-mode .modal-cancel-btn,
+        body.slate-mode .three-dots-btn,
+        body.slate-mode .statement-unit-card .statement-card-grid-metrics,
+        body.slate-mode .time-nav-glass-bar,
+        body.slate-mode .history-scope-toggle-bar,
+        body.slate-mode input,
+        body.slate-mode select,
+        body.slate-mode textarea {
+            background: #343940 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
+
+        body.slate-mode .time-glass-chip.active,
+        body.slate-mode .history-scope-btn.is-active {
+            background: #2E3238 !important;
+            color: #60A5FA !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        body.slate-mode .glass-wallet-chip.is-active {
+            background: #2563EB !important;
+            border-color: #3B82F6 !important;
+            color: #FFFFFF !important;
+        }
+
+        /* المربعات الأربعة في الشاشة الرئيسية وبطاقات الملخص */
+        body.slate-mode .ios-grid-tile {
+            background: #2E3238 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2) !important;
+        }
+        body.slate-mode .ios-grid-tile.is-income {
+            background: linear-gradient(145deg, #2B3532 0%, #2E3238 100%) !important;
+            border-color: rgba(52, 211, 153, 0.2) !important;
+        }
+        body.slate-mode .ios-grid-tile.is-expense {
+            background: linear-gradient(145deg, #352C2F 0%, #2E3238 100%) !important;
+            border-color: rgba(248, 113, 113, 0.2) !important;
+        }
+        body.slate-mode .ios-grid-tile.is-clients {
+            background: linear-gradient(145deg, #343028 0%, #2E3238 100%) !important;
+            border-color: rgba(251, 191, 36, 0.2) !important;
+        }
+        body.slate-mode .ios-grid-tile.is-history {
+            background: linear-gradient(145deg, #2A313C 0%, #2E3238 100%) !important;
+            border-color: rgba(96, 165, 250, 0.2) !important;
+        }
+
+        body.slate-mode .kpi-fixed-top-income {
+            background: linear-gradient(145deg, #2B3532 0%, #2E3238 100%) !important;
+            border-color: rgba(52, 211, 153, 0.2) !important;
+        }
+        body.slate-mode .kpi-sub-card.expense-card-fixed {
+            background: linear-gradient(145deg, #352C2F 0%, #2E3238 100%) !important;
+            border-color: rgba(248, 113, 113, 0.2) !important;
+        }
+        body.slate-mode .kpi-sub-card.balance-card-fixed {
+            background: linear-gradient(145deg, #2A313C 0%, #2E3238 100%) !important;
+            border-color: rgba(96, 165, 250, 0.2) !important;
+        }
+
+        body.slate-mode #expenseFullView .subpage-header-nav {
+            background: linear-gradient(145deg, #352C2F 0%, #2E3238 100%) !important;
+            border-color: rgba(248, 113, 113, 0.22) !important;
+        }
+        body.slate-mode #incomeFullView .subpage-header-nav {
+            background: linear-gradient(145deg, #2B3532 0%, #2E3238 100%) !important;
+            border-color: rgba(52, 211, 153, 0.22) !important;
+        }
+        body.slate-mode #reportsHistoryView .subpage-header-nav {
+            background: linear-gradient(145deg, #2A313C 0%, #2E3238 100%) !important;
+            border-color: rgba(96, 165, 250, 0.22) !important;
+        }
+
+        body.slate-mode .home-overview-num.green,
+        body.slate-mode .eq-num.green,
+        body.slate-mode .kpi-income-big-num {
+            color: #34D399 !important;
+        }
+        body.slate-mode .eq-num.red,
+        body.slate-mode .kpi-sub-num.red {
+            color: #F87171 !important;
+        }
+        body.slate-mode .eq-num.blue,
+        body.slate-mode .kpi-sub-num.blue,
+        body.slate-mode .home-summary-val.blue {
+            color: #60A5FA !important;
+        }
+        body.slate-mode .home-overview-num.amber,
+        body.slate-mode .eq-num.amber {
+            color: #FBBF24 !important;
+        }
+
+        body.slate-mode .sidebar-squircle-ico.slate-theme {
+            background: rgba(251, 191, 36, 0.16);
+            color: #FBBF24;
+        }
