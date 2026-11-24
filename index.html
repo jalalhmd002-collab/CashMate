@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="إدارة الأموال">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23F59E0B'/%3E%3Cstop offset='100%25' stop-color='%23D97706'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3Cpath d='M368 184v-28a36 36 0 0 0-36-36H148a36 36 0 0 0 0 72h220v120a36 36 0 0 1-36 36H148a36 36 0 0 1-36-36V156' fill='none' stroke='%23FFFFFF' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='336' cy='256' r='18' fill='%23FFFFFF'/%3E%3C/svg%3E">
     <link rel="manifest" id="dynamicPwaManifestLink">
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         @font-face {
           font-family: 'Aljazeera';
@@ -275,11 +277,7 @@
         }
 
         .claude-sidebar.is-collapsed .sidebar-nav-item,
-        .claude-sidebar.is-collapsed .sidebar-new-tx-btn {
-            justify-content: center;
-            padding-left: 0;
-            padding-right: 0;
-        }
+        .claude-sidebar.is-collapsed
 
         .sidebar-top-row {
             display: flex;
@@ -346,30 +344,6 @@
             border-color: var(--border-glass-base);
             color: var(--text-main);
         }
-
-        .sidebar-new-tx-btn {
-            width: 100%;
-            height: 42px;
-            border-radius: 12px;
-            background: var(--accent-gradient);
-            border: none;
-            color: #FFFFFF;
-            font-size: 0.9rem;
-            font-weight: 400;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            margin-bottom: 18px;
-            transition: var(--transition-smooth);
-        }
-        .sidebar-new-tx-btn:hover {
-            background: var(--accent-hover);
-            border-color: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-        .sidebar-new-tx-btn:active { transform: scale(0.98); }
 
         .sidebar-section-label {
             font-size: 0.74rem;
@@ -2827,7 +2801,6 @@
         .sidebar-brand-title,
         .sidebar-section-label,
         .sidebar-nav-item,
-        .sidebar-new-tx-btn,
         .subpage-header-title,
         .modal-sheet-title,
         .confirm-dialog-title,
@@ -3871,12 +3844,6 @@
             -webkit-backdrop-filter: saturate(180%) blur(15px) !important;
             border-left: 1px solid rgba(0, 0, 0, 0.06) !important;
         }
-        .sidebar-new-tx-btn {
-            border-radius: 16px !important;
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
-            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.24) !important;
-            font-weight: 700 !important;
-        }
         .sidebar-nav-list {
             background: #FFFFFF;
             border-radius: 18px;
@@ -4218,6 +4185,211 @@
             from { opacity: 0; transform: translateY(-12px) scale(0.985); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
+
+        /* بطاقة المزامنة السحابية ومعرّف الجهاز في الإعدادات */
+        .cloud-sync-card {
+            background: #F8F9FA;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 18px;
+            padding: 13px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .cloud-sync-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .cloud-sync-status-pill {
+            font-size: 0.74rem;
+            font-weight: 700 !important;
+            padding: 3px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .cloud-sync-status-pill.is-online {
+            background: var(--neon-green-subtle);
+            border: 1px solid var(--neon-green-border);
+            color: var(--neon-green);
+        }
+        .cloud-sync-status-pill.is-local {
+            background: var(--neon-amber-subtle);
+            border: 1px solid var(--neon-amber-border);
+            color: var(--neon-amber);
+        }
+        .device-id-display-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+        .device-id-code-txt {
+            font-size: 1rem;
+            font-weight: 800 !important;
+            color: #2563EB;
+            letter-spacing: 0.8px;
+            direction: ltr;
+            user-select: all;
+        }
+        .device-copy-btn {
+            height: 34px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: none;
+            background: #EFF6FF;
+            color: #2563EB;
+            font-size: 0.82rem;
+            font-weight: 700 !important;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .device-copy-btn:hover { background: #DBEAFE; }
+        .device-copy-btn:active { transform: scale(0.95); }
+
+        /* بطاقة الأمان وكلمات المرور + شاشة قفل الدخول بأسلوب Apple */
+        .security-settings-card {
+            background: #F8F9FA;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 18px;
+            padding: 13px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .security-sub-box {
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 14px;
+            padding: 11px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .security-sub-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .security-sub-title {
+            font-size: 0.88rem;
+            font-weight: 700 !important;
+            color: var(--text-main);
+        }
+        .security-status-badge {
+            font-size: 0.74rem;
+            font-weight: 700 !important;
+            padding: 2px 10px;
+            border-radius: 999px;
+        }
+        .security-status-badge.is-enabled {
+            background: var(--neon-green-subtle);
+            border: 1px solid var(--neon-green-border);
+            color: var(--neon-green);
+        }
+        .security-status-badge.is-disabled {
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            color: var(--text-muted);
+        }
+        .security-actions-row {
+            display: flex;
+            gap: 8px;
+        }
+        .security-action-btn {
+            flex: 1;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 700 !important;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .security-action-btn.is-change {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+        .security-action-btn.is-disable {
+            background: var(--neon-red-subtle);
+            color: var(--neon-red);
+        }
+        .security-action-btn:active { transform: scale(0.96); }
+
+        .app-lock-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            background: rgba(245, 245, 247, 0.96);
+            backdrop-filter: saturate(180%) blur(24px);
+            -webkit-backdrop-filter: saturate(180%) blur(24px);
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+        .app-lock-overlay.is-locked {
+            display: flex;
+        }
+        .app-lock-card {
+            width: 100%;
+            max-width: 360px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 24px;
+            padding: 26px 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .app-lock-icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        /* زر الانتقال إلى الملحقات والتصنيفات */
+        .accessories-launch-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 13px 14px;
+            border-radius: 16px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            text-align: right;
+            transition: var(--transition-smooth);
+        }
+        .accessories-launch-btn:hover {
+            border-color: var(--accent-border);
+            background: #FFFBEB;
+        }
+        .accessories-launch-btn:active { transform: scale(0.98); }
+        .sidebar-squircle-ico.teal { background: #F0FDFA; color: #0D9488; }
     </style>
 </head>
 <body>
@@ -4240,11 +4412,6 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
                 </button>
             </div>
-
-            <button type="button" class="sidebar-new-tx-btn" onclick="handleCenterPlusAction(); closeMobileSidebar();" title="إضافة حركة جديدة">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span class="sidebar-hide-on-collapse">حركة جديدة</span>
-            </button>
 
             <div class="sidebar-section-label sidebar-hide-on-collapse">الأقسام الرئيسية</div>
             <nav class="sidebar-nav-list">
@@ -4272,13 +4439,21 @@
                     <span class="sidebar-squircle-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/></svg></span>
                     <span class="sidebar-hide-on-collapse">الآلة الحاسبة</span>
                 </button>
-                <button type="button" class="sidebar-nav-item" id="pwaInstallSidebarBtn" onclick="triggerPwaInstall(); closeMobileSidebar();" title="تثبيت التطبيق على الجهاز">
-                    <span class="sidebar-squircle-ico amber-install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
-                    <span class="sidebar-hide-on-collapse">تثبيت التطبيق</span>
-                </button>
                 <button type="button" class="sidebar-nav-item" onclick="openGlassModal('settingsModal'); closeMobileSidebar();" title="الإعدادات والبيانات">
                     <span class="sidebar-squircle-ico gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
                     <span class="sidebar-hide-on-collapse">الإعدادات والبيانات</span>
+                </button>
+                <button type="button" class="sidebar-nav-item" onclick="openGlassModal('accessoriesModal'); closeMobileSidebar();" title="الملحقات والتصنيفات">
+                    <span class="sidebar-squircle-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>
+                    <span class="sidebar-hide-on-collapse">الملحقات والتصنيفات</span>
+                </button>
+                <button type="button" class="sidebar-nav-item" onclick="openGlassModal('securitySyncModal'); closeMobileSidebar();" title="الأمان والربط">
+                    <span class="sidebar-squircle-ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                    <span class="sidebar-hide-on-collapse">الأمان والربط</span>
+                </button>
+                <button type="button" class="sidebar-nav-item" id="pwaInstallSidebarBtn" onclick="triggerPwaInstall(); closeMobileSidebar();" title="تثبيت التطبيق على الجهاز">
+                    <span class="sidebar-squircle-ico amber-install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                    <span class="sidebar-hide-on-collapse">تثبيت التطبيق</span>
                 </button>
             </div>
         </div>
@@ -4748,7 +4923,7 @@
                 <button type="button" class="form-input-control custom-wallet-trigger-btn" id="modalTxWalletTriggerBtn" onclick="openWalletPickerModal('modalTxWalletSelect')">
                     <div class="wallet-trigger-left">
                         <svg class="wallet-trigger-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                        <span id="modalTxWalletSelectDisplay">القبض الكاش</span>
+                        <span id="modalTxWalletSelectDisplay">كاش</span>
                     </div>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -4827,7 +5002,7 @@
                     <button type="button" class="form-input-control custom-wallet-trigger-btn" id="clientInvoiceMethodTriggerBtn" onclick="openWalletPickerModal('clientInvoiceMethod')">
                         <div class="wallet-trigger-left">
                             <svg class="wallet-trigger-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                            <span id="clientInvoiceMethodDisplay">القبض الكاش</span>
+                            <span id="clientInvoiceMethodDisplay">كاش</span>
                         </div>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
@@ -4880,7 +5055,7 @@
                     <button type="button" class="form-input-control custom-wallet-trigger-btn" id="clientSettlementMethodTriggerBtn" onclick="openWalletPickerModal('clientSettlementMethod')">
                         <div class="wallet-trigger-left">
                             <svg class="wallet-trigger-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                            <span id="clientSettlementMethodDisplay">القبض الكاش</span>
+                            <span id="clientSettlementMethodDisplay">كاش</span>
                         </div>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
@@ -4945,6 +5120,19 @@
                 </button>
             </div>
 
+            <input type="file" id="fileImportInput" accept=".json" style="display:none;" onchange="importDataJSON(event)">
+        </div>
+    </div>
+</div>
+
+<!-- Modal 4B: الملحقات والتصنيفات -->
+<div class="glass-modal-backdrop" id="accessoriesModal" style="z-index: 260;" onclick="closeGlassModal('accessoriesModal')">
+    <div class="glass-modal-sheet" onclick="event.stopPropagation()" style="width: 95%; max-width: 480px;">
+        <div class="modal-sheet-header">
+            <span class="modal-sheet-title">الملحقات والتصنيفات</span>
+            <button class="icon-action-svg-btn" onclick="closeGlassModal('accessoriesModal')">✕</button>
+        </div>
+        <div class="modal-sheet-scroll-body">
             <div class="wallets-management-card">
                 <div class="wallets-manage-title">وسائل الدفع والمحافظ المالية:</div>
                 <div class="wallets-tags-list" id="settingsWalletsTagsContainer"></div>
@@ -4974,8 +5162,80 @@
                     <button type="button" class="wallets-add-btn" onclick="addNewIncomeCategory()">إضافة</button>
                 </div>
             </div>
+        </div>
+        <div class="modal-sheet-footer">
+            <button type="button" class="modal-cancel-btn" style="padding: 12px;" onclick="closeGlassModal('accessoriesModal')">عودة</button>
+        </div>
+    </div>
+</div>
 
-            <input type="file" id="fileImportInput" accept=".json" style="display:none;" onchange="importDataJSON(event)">
+<!-- Modal 4C: الأمان والربط (المزامنة السحابية وكلمات المرور) -->
+<div class="glass-modal-backdrop" id="securitySyncModal" style="z-index: 265;" onclick="closeGlassModal('securitySyncModal')">
+    <div class="glass-modal-sheet" onclick="event.stopPropagation()" style="width: 95%; max-width: 480px;">
+        <div class="modal-sheet-header">
+            <span class="modal-sheet-title">الأمان والربط</span>
+            <button class="icon-action-svg-btn" onclick="closeGlassModal('securitySyncModal')">✕</button>
+        </div>
+        <div class="modal-sheet-scroll-body">
+            <div class="cloud-sync-card" id="cloudSyncSettingsCard">
+                <div class="cloud-sync-header">
+                    <span class="wallets-manage-title">المزامنة ومعرّف الجهاز</span>
+                    <span class="cloud-sync-status-pill is-local" id="cloudSyncStatusBadge">حفظ محلي</span>
+                </div>
+                <div class="device-id-display-row">
+                    <div style="display:flex; flex-direction:column; gap:1px;">
+                        <span style="font-size:0.74rem; color:var(--text-muted);">كود هذا الجهاز:</span>
+                        <span class="device-id-code-txt" id="settingsCurrentDeviceId">DEV-000000</span>
+                    </div>
+                    <button type="button" class="device-copy-btn" onclick="copyDeviceIdToClipboard()">نسخ الكود</button>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <span style="font-size:0.78rem; color:var(--text-secondary); font-weight:700 !important;">ربط جهاز آخر / استعادة حساب:</span>
+                    <div class="wallets-add-inline-form">
+                        <input type="text" id="linkOtherDeviceIdInput" class="form-input-control wallets-add-input"
+                               placeholder="أدخل كود الجهاز (مثل DEV-8A4K92)..." dir="ltr" style="text-align:center; text-transform:uppercase;"
+                               autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+                        <button type="button" class="wallets-add-btn" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);" onclick="linkAndRestoreDeviceId()">ربط واستعادة البيانات</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-settings-card" id="securitySettingsCard">
+                <div class="wallets-manage-title">الأمان وكلمات المرور</div>
+
+                <div class="security-sub-box">
+                    <div class="security-sub-header">
+                        <span class="security-sub-title">قفل الدخول للبرنامج</span>
+                        <span class="security-status-badge is-disabled" id="appLockStatusBadge">غير مفعّلة</span>
+                    </div>
+                    <div id="appLockDisabledControls" class="wallets-add-inline-form">
+                        <input type="password" id="newAppLockPwdInput" class="form-input-control wallets-add-input" placeholder="أدخل كلمة مرور الدخول..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('appLock')">
+                        <button type="button" class="wallets-add-btn" onclick="enableSecurityPassword('appLock')">تفعيل وحفظ</button>
+                    </div>
+                    <div id="appLockEnabledControls" class="security-actions-row" style="display:none;">
+                        <button type="button" class="security-action-btn is-change" onclick="openSecurityActionPrompt('appLock', 'change')">تغيير كلمة المرور</button>
+                        <button type="button" class="security-action-btn is-disable" onclick="openSecurityActionPrompt('appLock', 'disable')">إلغاء الحماية</button>
+                    </div>
+                </div>
+
+                <div class="security-sub-box">
+                    <div class="security-sub-header">
+                        <span class="security-sub-title">حماية عمليات الحذف</span>
+                        <span class="security-status-badge is-disabled" id="deletePwdStatusBadge">غير مفعّلة</span>
+                    </div>
+                    <div id="deletePwdDisabledControls" class="wallets-add-inline-form">
+                        <input type="password" id="newDeletePwdInput" class="form-input-control wallets-add-input" placeholder="أدخل كلمة مرور الحذف..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('delete')">
+                        <button type="button" class="wallets-add-btn" onclick="enableSecurityPassword('delete')">تفعيل وحفظ</button>
+                    </div>
+                    <div id="deletePwdEnabledControls" class="security-actions-row" style="display:none;">
+                        <button type="button" class="security-action-btn is-change" onclick="openSecurityActionPrompt('delete', 'change')">تغيير كلمة المرور</button>
+                        <button type="button" class="security-action-btn is-disable" onclick="openSecurityActionPrompt('delete', 'disable')">إلغاء الحماية</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-sheet-footer">
+            <button type="button" class="modal-cancel-btn" style="padding: 12px;" onclick="closeGlassModal('securitySyncModal')">عودة</button>
         </div>
     </div>
 </div>
@@ -5028,6 +5288,11 @@
     <div class="confirm-dialog-wrapper" onclick="event.stopPropagation()">
         <div class="confirm-dialog-title" id="confirmBoxHeader">تأكيد</div>
         <div class="confirm-dialog-msg" id="confirmBoxMessage">هل أنت متأكد؟</div>
+        <div id="confirmDeletePwdBox" style="display:none; margin-bottom:14px; text-align:right;">
+            <span class="form-label-txt" style="display:block; margin-bottom:5px;">أدخل كلمة مرور الحذف للتأكيد:</span>
+            <input type="password" id="confirmDeletePwdInput" class="form-input-control" placeholder="كلمة مرور الحذف..." style="text-align:center;" autocomplete="off" onkeydown="if(event.key==='Enter') runApprovedAction()">
+            <div id="confirmDeletePwdErr" style="display:none; color:var(--neon-red); font-size:0.82rem; margin-top:5px; text-align:center;">كلمة مرور الحذف غير صحيحة!</div>
+        </div>
         <div class="confirm-dialog-buttons">
             <button class="confirm-button-unit" onclick="closeGlassModal('confirmAlertModal')">إلغاء</button>
             <button class="confirm-button-unit danger" onclick="runApprovedAction()">تأكيد</button>
@@ -5137,13 +5402,54 @@
     </div>
 </div>
 
+<!-- Modal: التحقق من كلمة المرور الحالية عند التغيير أو الإلغاء -->
+<div class="glass-modal-backdrop" id="securityVerifyModal" style="z-index: 320;" onclick="closeGlassModal('securityVerifyModal')">
+    <div class="glass-modal-sheet" onclick="event.stopPropagation()" style="max-width: 390px;">
+        <div class="modal-sheet-header">
+            <span class="modal-sheet-title" id="secVerifyModalTitle">التحقق من كلمة المرور</span>
+            <button class="icon-action-svg-btn" onclick="closeGlassModal('securityVerifyModal')">✕</button>
+        </div>
+        <div class="modal-sheet-scroll-body">
+            <div class="form-row-group">
+                <span class="form-label-txt">كلمة المرور الحالية</span>
+                <input type="password" id="secVerifyCurrentInput" class="form-input-control" placeholder="أدخل كلمة المرور الحالية..." autocomplete="off" style="text-align:center;" onkeydown="if(event.key==='Enter') submitSecurityVerifyAction()">
+            </div>
+            <div class="form-row-group" id="secVerifyNewGroup" style="display:none;">
+                <span class="form-label-txt">كلمة المرور الجديدة</span>
+                <input type="password" id="secVerifyNewInput" class="form-input-control" placeholder="أدخل كلمة المرور الجديدة..." autocomplete="new-password" style="text-align:center;" onkeydown="if(event.key==='Enter') submitSecurityVerifyAction()">
+            </div>
+            <div id="secVerifyErrorMsg" style="display:none; color:var(--neon-red); font-size:0.84rem; text-align:center; margin-top:4px;">كلمة المرور الحالية غير صحيحة!</div>
+        </div>
+        <div class="modal-sheet-footer">
+            <div class="modal-footer-actions-grid">
+                <button type="button" class="commit-glass-btn" id="secVerifyConfirmBtn" onclick="submitSecurityVerifyAction()">تأكيد</button>
+                <button type="button" class="modal-cancel-btn" onclick="closeGlassModal('securityVerifyModal')">إلغاء الأمر</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- شاشة قفل الدخول للبرنامج بأسلوب Apple -->
+<div class="app-lock-overlay" id="appLockScreenOverlay">
+    <div class="app-lock-card">
+        <div class="app-lock-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div style="font-size:1.25rem; font-weight:700 !important; color:var(--text-main);">البرنامج مقفل</div>
+        <div style="font-size:0.88rem; color:var(--text-secondary);">أدخل كلمة مرور الدخول للوصول إلى حساباتك</div>
+        <input type="password" id="appLockUnlockInput" class="form-input-control" placeholder="كلمة المرور..." style="text-align:center;" autocomplete="off" onkeydown="if(event.key==='Enter') attemptUnlockApp()">
+        <div id="appLockErrorMsg" style="display:none; color:var(--neon-red); font-size:0.84rem;">كلمة المرور غير صحيحة!</div>
+        <button type="button" class="commit-glass-btn" style="background:linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); margin-top:2px;" onclick="attemptUnlockApp()">فتح البرنامج</button>
+    </div>
+</div>
+
 <div class="toast-neon-box" id="neonToastPopup">
     <span id="toastIconSlot">✓</span>
     <span id="toastTextSlot">تم الإجراء بنجاح</span>
 </div>
 
 <script>
-    const DEFAULT_WALLETS = ["القبض الكاش", "بنك فلسطين", "محفظة بنك", "جوال باي"];
+    const DEFAULT_WALLETS = ["كاش", "بنك", "محفظة", "جوال باي"];
     const DEFAULT_EXPENSE_CATEGORIES = [
         "تكاليف مدارس",
         "مواصلات ووقود",
@@ -5241,7 +5547,7 @@
         const catInp = document.getElementById("quickComposerCategory");
         const amount = parseNumberSafe(amtInp ? amtInp.value : "", NaN);
         const category = (catInp ? catInp.value : "").trim();
-        const wallet = modalSelectedWallet || (paymentWallets[0] || "القبض الكاش");
+        const wallet = modalSelectedWallet || (paymentWallets[0] || "كاش");
         const date = formatISODate(new Date());
 
         if (isNaN(amount) || amount <= 0) {
@@ -5432,7 +5738,7 @@
     let savedClients = [];
     let currentMainType = "EXPENSE";
     let modalActiveTxType = "EXPENSE";
-    let modalSelectedWallet = "القبض الكاش";
+    let modalSelectedWallet = "كاش";
     let activePeriodKey = "day";
     let activeRefDate = new Date();
     let customPickedStartDate = formatISODate(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -5448,12 +5754,31 @@
     let clientsSubFilter = 'ALL';
     let customAppTitle = "";
 
+    function normalizeWalletName(w) {
+        const clean = String(w || "").trim();
+        if (clean === "القبض الكاش") return "كاش";
+        if (clean === "بنك فلسطين") return "بنك";
+        if (clean === "محفظة بنك") return "محفظة";
+        return clean;
+    }
+
+    function normalizeWalletList(list) {
+        if (!Array.isArray(list)) return [...DEFAULT_WALLETS];
+        const out = [];
+        list.forEach(w => {
+            const nw = normalizeWalletName(w);
+            if (nw && !out.includes(nw)) out.push(nw);
+        });
+        return out.length > 0 ? out : [...DEFAULT_WALLETS];
+    }
+
     function getWalletBalance(walletName, excludeTxId = null) {
         let bal = 0;
         for (let i = 0; i < allTransactions.length; i++) {
             const t = allTransactions[i];
             if (excludeTxId != null && t.id == excludeTxId) continue;
-            if (t.wallet === walletName) {
+            const targetNormW = normalizeWalletName(walletName);
+            if (normalizeWalletName(t.wallet) === targetNormW) {
                 const amt = Number(t.amount) || 0;
                 if (t.type === "INCOME") bal += amt;
                 else if (t.type === "EXPENSE") bal -= amt;
@@ -5462,7 +5787,8 @@
         for (let i = 0; i < clientTransactions.length; i++) {
             const t = clientTransactions[i];
             if (excludeTxId != null && t.id == excludeTxId) continue;
-            if (t.wallet === walletName) {
+            const targetNormW = normalizeWalletName(walletName);
+            if (normalizeWalletName(t.wallet) === targetNormW) {
                 const amt = Number(t.amount) || 0;
                 if (amt > 0) bal += amt;
             }
@@ -5557,6 +5883,7 @@
         customAppTitle = val;
         UnifiedStorage.save("app_custom_title_v1", val);
         updateAppTitleDisplay();
+        pushCloudSync();
     }
 
     function updateAppTitleDisplay() {
@@ -5588,6 +5915,8 @@
         UnifiedStorage.save("app_saved_clients_v18", savedClients);
         UnifiedStorage.save("app_archived_clients_v17", archivedClients);
         if (customAppTitle !== undefined) UnifiedStorage.save("app_custom_title_v1", customAppTitle);
+        UnifiedStorage.save("app_lock_password_v1", appLockPassword || "");
+        UnifiedStorage.save("delete_password_v1", deletePassword || "");
     }
 
     function autoSaveAllState() {
@@ -5636,13 +5965,17 @@
         savedClients = Array.isArray(storedClients) ? storedClients : [];
 
         const storedWallets = UnifiedStorage.load("app_payment_wallets_v17");
-        paymentWallets = (Array.isArray(storedWallets) && storedWallets.length > 0) ? storedWallets : [...DEFAULT_WALLETS];
+        paymentWallets = (Array.isArray(storedWallets) && storedWallets.length > 0) ? normalizeWalletList(storedWallets) : [...DEFAULT_WALLETS];
 
         const storedArchived = UnifiedStorage.load("app_archived_clients_v17");
         archivedClients = Array.isArray(storedArchived) ? storedArchived : [];
 
         customAppTitle = UnifiedStorage.load("app_custom_title_v1") || "";
+        appLockPassword = UnifiedStorage.load("app_lock_password_v1") || "";
+        deletePassword = UnifiedStorage.load("delete_password_v1") || "";
         updateAppTitleDisplay();
+        renderSecuritySettingsUI();
+        checkAppLockOnStartup();
 
         const storedTx = UnifiedStorage.load("app_finances_data_v17");
         allTransactions = Array.isArray(storedTx) ? storedTx : [];
@@ -5663,6 +5996,7 @@
         updateClientsDatalist();
         renderMainState();
 
+        initCloudSync();
         UnifiedStorage.loadAllFromIDB(function(idbData) {
             if (!idbData) return;
             let updated = false;
@@ -5683,10 +6017,21 @@
             if (idbData["app_custom_title_v1"] !== undefined && !customAppTitle) {
                 customAppTitle = idbData["app_custom_title_v1"];
                 updateAppTitleDisplay();
+            renderSecuritySettingsUI();
+            checkAppLockOnStartup();
+            }
+            if (idbData["app_lock_password_v1"] !== undefined && !appLockPassword) {
+                appLockPassword = idbData["app_lock_password_v1"] || "";
+                renderSecuritySettingsUI();
+                checkAppLockOnStartup();
+            }
+            if (idbData["delete_password_v1"] !== undefined && !deletePassword) {
+                deletePassword = idbData["delete_password_v1"] || "";
+                renderSecuritySettingsUI();
             }
             if (Array.isArray(idbData["app_saved_clients_v18"])) savedClients = idbData["app_saved_clients_v18"];
             if (Array.isArray(idbData["app_payment_wallets_v17"]) && idbData["app_payment_wallets_v17"].length > 0) {
-                paymentWallets = idbData["app_payment_wallets_v17"];
+                paymentWallets = normalizeWalletList(idbData["app_payment_wallets_v17"]);
                 updated = true;
             }
             if (Array.isArray(idbData["app_client_transactions_v1"]) && idbData["app_client_transactions_v1"].length > clientTransactions.length) {
@@ -5990,30 +6335,36 @@
         UnifiedStorage.save("app_finances_data_v17", allTransactions);
         UnifiedStorage.save("app_client_transactions_v1", clientTransactions);
         updateClientsDatalist();
+        pushCloudSync();
     }
 
     function saveWalletsStorage() {
         UnifiedStorage.save("app_payment_wallets_v17", paymentWallets);
         renderDynamicWalletsUI();
+        pushCloudSync();
     }
 
     function saveArchivedStorage() {
         UnifiedStorage.save("app_archived_clients_v17", archivedClients);
+        pushCloudSync();
     }
 
     function saveExpenseCategoriesStorage() {
         UnifiedStorage.save("app_expense_categories_v18", savedExpenseCategories);
         renderCategoriesDatalistAndChips();
+        pushCloudSync();
     }
 
     function saveIncomeCategoriesStorage() {
         UnifiedStorage.save("app_income_categories_v18", savedIncomeCategories);
         renderCategoriesDatalistAndChips();
+        pushCloudSync();
     }
 
     function saveClientsStorage() {
         UnifiedStorage.save("app_saved_clients_v18", savedClients);
         populateClientDropdown(getAllClients());
+        pushCloudSync();
     }
 
     let historyTimeScope = 'ALL';
@@ -6211,7 +6562,7 @@
                             <span class="unified-tx-title">${noteTxt}</span>
                         </div>
                         <div class="unified-tx-row2">
-                            <span class="record-wallet-badge">${getWalletIconEmoji(tx.wallet)}${escapeHTML(tx.wallet)}</span>
+                            <span class="record-wallet-badge">${getWalletIconEmoji(tx.wallet)}${escapeHTML(normalizeWalletName(tx.wallet))}</span>
                         </div>
                         <div class="unified-tx-row3">${formatDateWithTime(tx)}</div>
                     </div>
@@ -6467,11 +6818,15 @@
             displayToast("يجب الإبقاء على تصنيف مصروف واحد على الأقل", true);
             return;
         }
-        savedExpenseCategories = savedExpenseCategories.filter(item => item !== c);
-        const catInp = document.getElementById("inputTxCategory");
-        if (catInp && catInp.value === c && modalActiveTxType === "EXPENSE") catInp.value = "";
-        saveExpenseCategoriesStorage();
-        displayToast(`تم حذف تصنيف المصروف الفارغ "${c}"`);
+        const doDel = () => {
+            savedExpenseCategories = savedExpenseCategories.filter(item => item !== c);
+            const catInp = document.getElementById("inputTxCategory");
+            if (catInp && catInp.value === c && modalActiveTxType === "EXPENSE") catInp.value = "";
+            saveExpenseCategoriesStorage();
+            displayToast(`تم حذف تصنيف المصروف الفارغ "${c}"`);
+        };
+        if (deletePassword) promptConfirmDialog("حذف تصنيف مصروف", `هل تريد حذف التصنيف "${c}"؟`, doDel, true);
+        else doDel();
     }
 
     function removeSavedIncomeCategory(c) {
@@ -6483,11 +6838,15 @@
             displayToast("يجب الإبقاء على تصنيف دخل واحد على الأقل", true);
             return;
         }
-        savedIncomeCategories = savedIncomeCategories.filter(item => item !== c);
-        const catInp = document.getElementById("inputTxCategory");
-        if (catInp && catInp.value === c && modalActiveTxType === "INCOME") catInp.value = "";
-        saveIncomeCategoriesStorage();
-        displayToast(`تم حذف تصنيف الدخل الفارغ "${c}"`);
+        const doDel = () => {
+            savedIncomeCategories = savedIncomeCategories.filter(item => item !== c);
+            const catInp = document.getElementById("inputTxCategory");
+            if (catInp && catInp.value === c && modalActiveTxType === "INCOME") catInp.value = "";
+            saveIncomeCategoriesStorage();
+            displayToast(`تم حذف تصنيف الدخل الفارغ "${c}"`);
+        };
+        if (deletePassword) promptConfirmDialog("حذف تصنيف دخل", `هل تريد حذف التصنيف "${c}"؟`, doDel, true);
+        else doDel();
     }
 
     function renderDynamicWalletsUI() {
@@ -6769,7 +7128,7 @@
             const inHistoryScope = (historyTimeScope === 'ALL') || (t.date >= startHistD && t.date <= endHistD);
             if (inHistoryScope) {
                 historyScopeItems.push(t);
-                if (selectedHistoryWallet === "ALL" || t.wallet === selectedHistoryWallet) {
+                if (selectedHistoryWallet === "ALL" || normalizeWalletName(t.wallet) === normalizeWalletName(selectedHistoryWallet)) {
                     if (t.type === "INCOME") histIncome += amt;
                     else if (t.type === "EXPENSE") histExpense += amt;
                 }
@@ -6802,7 +7161,7 @@
             const inHistoryScope = (historyTimeScope === 'ALL') || (t.date >= startHistD && t.date <= endHistD);
             if (inHistoryScope) {
                 historyScopeItems.push(normalizedReceipt);
-                if (selectedHistoryWallet === "ALL" || t.wallet === selectedHistoryWallet) {
+                if (selectedHistoryWallet === "ALL" || normalizeWalletName(t.wallet) === normalizeWalletName(selectedHistoryWallet)) {
                     histIncome += amt;
                 }
             }
@@ -6950,7 +7309,7 @@
         const searchQuery = normalizeArabicText(searchInp ? searchInp.value : "");
         const filteredHistory = historyScopeItems.filter(t => {
             if (historyReportTypeFilter !== "ALL" && t.type !== historyReportTypeFilter) return false;
-            if (selectedHistoryWallet !== "ALL" && t.wallet !== selectedHistoryWallet) return false;
+            if (selectedHistoryWallet !== "ALL" && normalizeWalletName(t.wallet) !== normalizeWalletName(selectedHistoryWallet)) return false;
             if (selectedHistoryCategory && t.category !== selectedHistoryCategory) return false;
             if (searchQuery) {
                 const hay = normalizeArabicText([t.category, t.note, t.client, t.wallet, t.amount, t.date].join(" "));
@@ -7004,7 +7363,7 @@
                     </div>
                     <div class="unified-tx-row2">
                         <span class="unified-tx-type-plain ${isPay ? "green" : "amber"}">${typeText}</span>
-                        ${t.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(t.wallet)}${escapeHTML(t.wallet)}</span>` : ""}
+                        ${t.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(t.wallet)}${escapeHTML(normalizeWalletName(t.wallet))}</span>` : ""}
                     </div>
                     <div class="unified-tx-row3">${formatDateWithTime(t)}</div>
                 </div>
@@ -7175,7 +7534,7 @@
                         <div style="display:flex; flex-direction:column; gap:3px; min-width:0; flex:1;">
                             <div style="display:flex; align-items:center; gap:5px; min-width:0; flex-wrap:wrap;">
                                 <span class="statement-card-desc">${escapeHTML((t.note === "فاتورة خدمة / مبيعات" ? "فاتورة مبيعات" : (t.note || t.category)))}</span>
-                                <span class="statement-card-wallet-badge">• ${escapeHTML(t.wallet)}</span>
+                                <span class="statement-card-wallet-badge">• ${escapeHTML(normalizeWalletName(t.wallet))}</span>
                             </div>
                             <span class="statement-card-date-badge" style="text-align:right;">${formatDateWithTime(t)}</span>
                         </div>
@@ -7346,8 +7705,8 @@
 
             const row2Html = isClient
                 ? `<span class="unified-tx-type-plain ${isPay ? 'green' : 'amber'}">${badgeText}</span>
-                   ${tx.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(tx.wallet)}${escapeHTML(tx.wallet)}</span>` : ""}`
-                : `${tx.wallet ? `<span class="record-wallet-badge">${getWalletIconEmoji(tx.wallet)}${escapeHTML(tx.wallet)}</span>` : ""}
+                   ${tx.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(tx.wallet)}${escapeHTML(normalizeWalletName(tx.wallet))}</span>` : ""}`
+                : `${tx.wallet ? `<span class="record-wallet-badge">${getWalletIconEmoji(tx.wallet)}${escapeHTML(normalizeWalletName(tx.wallet))}</span>` : ""}
                    ${descText ? `<span class="unified-tx-desc">${descText}</span>` : ""}`;
 
             row.innerHTML = `
@@ -7438,7 +7797,7 @@
                         <div style="display:flex; flex-direction:column; gap:3px; min-width:0; flex:1;">
                             <div style="display:flex; align-items:center; gap:5px; min-width:0; flex-wrap:wrap;">
                                 <span class="statement-card-desc">${escapeHTML((t.note === "فاتورة خدمة / مبيعات" ? "فاتورة مبيعات" : (t.note || t.category)))}</span>
-                                <span class="statement-card-wallet-badge">• ${escapeHTML(t.wallet)}</span>
+                                <span class="statement-card-wallet-badge">• ${escapeHTML(normalizeWalletName(t.wallet))}</span>
                             </div>
                             <span class="statement-card-date-badge" style="text-align:right;">${formatDateWithTime(t)}</span>
                         </div>
@@ -7556,12 +7915,16 @@
             displayToast(`لا يمكن حذف الزبون "${c}" لوجود حركات مالية مسجلة له!`, true);
             return;
         }
-        savedClients = savedClients.filter(item => item !== c);
-        const invClientInp = document.getElementById("invClientName");
-        if (invClientInp && invClientInp.value === c) invClientInp.value = "";
-        saveClientsStorage();
-        populateClientDropdown(getAllClients());
-        displayToast(`تم حذف الزبون الفارغ "${c}"`);
+        const doDel = () => {
+            savedClients = savedClients.filter(item => item !== c);
+            const invClientInp = document.getElementById("invClientName");
+            if (invClientInp && invClientInp.value === c) invClientInp.value = "";
+            saveClientsStorage();
+            populateClientDropdown(getAllClients());
+            displayToast(`تم حذف الزبون الفارغ "${c}"`);
+        };
+        if (deletePassword) promptConfirmDialog("حذف زبون", `هل تريد حذف الزبون "${c}"؟`, doDel, true);
+        else doDel();
     }
 
     function openClientDropdown(populateAll = false, forceShowEmpty = false) {
@@ -7757,7 +8120,7 @@
         targets.forEach(t => {
             const sel = document.getElementById(t.selId);
             const disp = document.getElementById(t.dispId);
-            if (sel && disp) disp.innerText = sel.value || (paymentWallets[0] || "القبض الكاش");
+            if (sel && disp) disp.innerText = sel.value || (paymentWallets[0] || "كاش");
         });
     }
 
@@ -7909,7 +8272,7 @@
         const client = (document.getElementById("invClientName").value || "").trim();
         const total = parseNumberSafe(document.getElementById("invTotalAmount").value, NaN);
         const paid = parseNumberSafe(document.getElementById("invPaidAmount").value, 0);
-        const wallet = document.getElementById("clientInvoiceMethod").value || (paymentWallets[0] || "القبض الكاش");
+        const wallet = document.getElementById("clientInvoiceMethod").value || (paymentWallets[0] || "كاش");
         const date = formatISODate(new Date());
         const desc = (document.getElementById("invDesc").value || "").trim() || "فاتورة مبيعات";
 
@@ -7961,7 +8324,7 @@
     function executeCommitClientPayment() {
         const client = (document.getElementById("payClientName").value || "").trim();
         const paid = parseNumberSafe(document.getElementById("clientSettlementAmount").value, NaN);
-        const wallet = document.getElementById("clientSettlementMethod").value || (paymentWallets[0] || "القبض الكاش");
+        const wallet = document.getElementById("clientSettlementMethod").value || (paymentWallets[0] || "كاش");
         const date = document.getElementById("clientSettlementDate").value || formatISODate(new Date());
         const note = (document.getElementById("payNote").value || "").trim() || "سداد دفعة نقدية";
 
@@ -8016,20 +8379,47 @@
             updateClientsDatalist();
             closeGlassModal("settingsModal");
             navigateToHomeView();
+            pushCloudSync();
             displayToast("تم مسح كافة البيانات وتصفير الحسابات بنجاح");
         });
     }
 
-    function promptConfirmDialog(title, msg, callback) {
+    let pendingConfirmRequiresDeletePwd = false;
+
+    function promptConfirmDialog(title, msg, callback, requireDeletePwd = true) {
         document.getElementById("confirmBoxHeader").innerText = title;
         document.getElementById("confirmBoxMessage").innerText = msg;
         pendingConfirmCallback = callback;
+        pendingConfirmRequiresDeletePwd = Boolean(requireDeletePwd && deletePassword);
+
+        const pwdBox = document.getElementById("confirmDeletePwdBox");
+        const pwdInp = document.getElementById("confirmDeletePwdInput");
+        const pwdErr = document.getElementById("confirmDeletePwdErr");
+        if (pwdBox) pwdBox.style.display = pendingConfirmRequiresDeletePwd ? "block" : "none";
+        if (pwdInp) pwdInp.value = "";
+        if (pwdErr) pwdErr.style.display = "none";
+
         openGlassModal("confirmAlertModal");
+        if (pendingConfirmRequiresDeletePwd && pwdInp) {
+            setTimeout(() => pwdInp.focus(), 80);
+        }
     }
 
     function runApprovedAction() {
+        if (pendingConfirmRequiresDeletePwd && deletePassword) {
+            const pwdInp = document.getElementById("confirmDeletePwdInput");
+            const pwdErr = document.getElementById("confirmDeletePwdErr");
+            const entered = pwdInp ? pwdInp.value : "";
+            if (entered !== deletePassword) {
+                if (pwdErr) pwdErr.style.display = "block";
+                displayToast("كلمة مرور الحذف غير صحيحة!", true);
+                if (pwdInp) pwdInp.focus();
+                return;
+            }
+        }
         const cb = pendingConfirmCallback;
         pendingConfirmCallback = null;
+        pendingConfirmRequiresDeletePwd = false;
         closeGlassModal("confirmAlertModal");
         if (typeof cb === "function") cb();
     }
@@ -8128,7 +8518,7 @@
                         UnifiedStorage.save("app_custom_title_v1", customAppTitle);
                         updateAppTitleDisplay();
                     }
-                    if (Array.isArray(parsed.wallets)) paymentWallets = parsed.wallets;
+                    if (Array.isArray(parsed.wallets)) paymentWallets = normalizeWalletList(parsed.wallets);
                     if (Array.isArray(parsed.expenseCategories)) savedExpenseCategories = parsed.expenseCategories;
                     if (Array.isArray(parsed.incomeCategories)) savedIncomeCategories = parsed.incomeCategories;
                     if (Array.isArray(parsed.categories)) {
@@ -8320,6 +8710,394 @@
             else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') { calcInput('C'); e.preventDefault(); }
         }
     });
+
+    // =========================================================================
+    // الربط السحابي عبر Firebase Firestore وعزل الأجهزة (Device ID Isolation)
+    // =========================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6kt-gmzaP48O9UrMgftscepK9tIzpG9Q",
+        authDomain: "my-gemini-site-2026.firebaseapp.com",
+        projectId: "my-gemini-site-2026",
+        storageBucket: "my-gemini-site-2026.firebasestorage.app",
+        messagingSenderId: "481544142251",
+        appId: "1:481544142251:web:5d53ec7cd5a4d17b4b26ee"
+    };
+
+    let firestoreDb = null;
+    let currentDeviceId = null;
+    let unsubscribeFirestoreSnapshot = null;
+    let isApplyingCloudSnapshot = false;
+    let lastLocalWriteTs = 0;
+
+    function getOrCreateDeviceId() {
+        let id = "";
+        try { id = (localStorage.getItem("cashmate_device_id") || "").trim(); } catch(e) {}
+        if (!id) {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            id = "DEV-" + code;
+            try { localStorage.setItem("cashmate_device_id", id); } catch(e) {}
+        }
+        currentDeviceId = id;
+        const disp = document.getElementById("settingsCurrentDeviceId");
+        if (disp) disp.innerText = id;
+        return id;
+    }
+
+    function updateCloudSyncBadge(isOnline, customLabel = null) {
+        const badge = document.getElementById("cloudSyncStatusBadge");
+        if (!badge) return;
+        if (isOnline && navigator.onLine !== false) {
+            badge.className = "cloud-sync-status-pill is-online";
+            badge.innerText = customLabel || "متصل بالسحابة";
+        } else {
+            badge.className = "cloud-sync-status-pill is-local";
+            badge.innerText = customLabel || "حفظ محلي";
+        }
+    }
+
+    function buildCloudPayload() {
+        return {
+            deviceId: currentDeviceId,
+            appTitle: customAppTitle || "",
+            transactions: allTransactions,
+            clientTransactions: clientTransactions,
+            wallets: paymentWallets,
+            expenseCategories: savedExpenseCategories,
+            incomeCategories: savedIncomeCategories,
+            clients: savedClients,
+            archivedClients: archivedClients,
+            appLockPassword: appLockPassword || "",
+            deletePassword: deletePassword || "",
+            updatedAt: Date.now()
+        };
+    }
+
+    function applyCloudPayload(data) {
+        if (!data || typeof data !== "object") return;
+        isApplyingCloudSnapshot = true;
+        try {
+            if (Array.isArray(data.transactions)) allTransactions = data.transactions;
+            if (Array.isArray(data.clientTransactions)) clientTransactions = data.clientTransactions;
+            if (Array.isArray(data.wallets) && data.wallets.length > 0) paymentWallets = normalizeWalletList(data.wallets);
+            if (Array.isArray(data.expenseCategories) && data.expenseCategories.length > 0) savedExpenseCategories = data.expenseCategories;
+            if (Array.isArray(data.incomeCategories) && data.incomeCategories.length > 0) savedIncomeCategories = data.incomeCategories;
+            if (Array.isArray(data.clients)) savedClients = data.clients;
+            if (Array.isArray(data.archivedClients)) archivedClients = data.archivedClients;
+            if (data.appTitle !== undefined) customAppTitle = data.appTitle || "";
+            if (data.appLockPassword !== undefined) appLockPassword = data.appLockPassword || "";
+            if (data.deletePassword !== undefined) deletePassword = data.deletePassword || "";
+
+            migrateClientTransactionsIfNeeded();
+            persistAllDataOnly();
+            updateAppTitleDisplay();
+            renderDynamicWalletsUI();
+            renderCategoriesDatalistAndChips();
+            updateClientsDatalist();
+            renderMainState();
+            const stmtView = document.getElementById("clientStatementView");
+            if (stmtView && !stmtView.classList.contains("is-hidden")) {
+                renderClientStatement();
+            }
+        } finally {
+            isApplyingCloudSnapshot = false;
+        }
+    }
+
+    function pushCloudSync() {
+        if (!firestoreDb || !currentDeviceId || isApplyingCloudSnapshot) return;
+        try {
+            lastLocalWriteTs = Date.now();
+            const payload = buildCloudPayload();
+            payload.updatedAt = lastLocalWriteTs;
+            firestoreDb.collection("cashmate_devices").doc(currentDeviceId)
+                .set(payload, { merge: true })
+                .then(() => {
+                    updateCloudSyncBadge(true, "متصل ومزامن");
+                })
+                .catch(() => {
+                    updateCloudSyncBadge(false, "حفظ محلي");
+                });
+        } catch(e) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        }
+    }
+
+    function attachDeviceRealtimeListener(deviceId) {
+        if (!firestoreDb || !deviceId) return;
+        if (typeof unsubscribeFirestoreSnapshot === "function") {
+            try { unsubscribeFirestoreSnapshot(); } catch(e) {}
+            unsubscribeFirestoreSnapshot = null;
+        }
+        const docRef = firestoreDb.collection("cashmate_devices").doc(deviceId);
+        unsubscribeFirestoreSnapshot = docRef.onSnapshot((docSnap) => {
+            if (!docSnap.exists) return;
+            updateCloudSyncBadge(true, "متصل بالسحابة");
+            if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+            const data = docSnap.data();
+            if (!data) return;
+            if (data.updatedAt && data.updatedAt <= lastLocalWriteTs) return;
+            applyCloudPayload(data);
+        }, () => {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        });
+    }
+
+    let appLockPassword = "";
+    let deletePassword = "";
+    let isAppUnlockedThisSession = false;
+    let pendingSecurityVerifyTarget = null;
+    let pendingSecurityVerifyAction = null;
+
+    function checkAppLockOnStartup() {
+        const overlay = document.getElementById("appLockScreenOverlay");
+        if (!overlay) return;
+        if (appLockPassword && !isAppUnlockedThisSession) {
+            overlay.classList.add("is-locked");
+            const inp = document.getElementById("appLockUnlockInput");
+            const err = document.getElementById("appLockErrorMsg");
+            if (err) err.style.display = "none";
+            if (inp) { inp.value = ""; setTimeout(() => inp.focus(), 100); }
+        } else {
+            overlay.classList.remove("is-locked");
+        }
+    }
+
+    function attemptUnlockApp() {
+        const inp = document.getElementById("appLockUnlockInput");
+        const err = document.getElementById("appLockErrorMsg");
+        const entered = inp ? inp.value : "";
+        if (entered === appLockPassword) {
+            isAppUnlockedThisSession = true;
+            if (err) err.style.display = "none";
+            if (inp) inp.value = "";
+            document.getElementById("appLockScreenOverlay").classList.remove("is-locked");
+            displayToast("تم فتح البرنامج بنجاح");
+        } else {
+            if (err) err.style.display = "block";
+            if (inp) { inp.value = ""; inp.focus(); }
+        }
+    }
+
+    function renderSecuritySettingsUI() {
+        const appBadge = document.getElementById("appLockStatusBadge");
+        const appDis = document.getElementById("appLockDisabledControls");
+        const appEn = document.getElementById("appLockEnabledControls");
+        const hasAppLock = Boolean(appLockPassword);
+        if (appBadge) {
+            appBadge.innerText = hasAppLock ? "مفعّلة" : "غير مفعّلة";
+            appBadge.className = `security-status-badge ${hasAppLock ? "is-enabled" : "is-disabled"}`;
+        }
+        if (appDis) appDis.style.display = hasAppLock ? "none" : "flex";
+        if (appEn) appEn.style.display = hasAppLock ? "flex" : "none";
+
+        const delBadge = document.getElementById("deletePwdStatusBadge");
+        const delDis = document.getElementById("deletePwdDisabledControls");
+        const delEn = document.getElementById("deletePwdEnabledControls");
+        const hasDelPwd = Boolean(deletePassword);
+        if (delBadge) {
+            delBadge.innerText = hasDelPwd ? "مفعّلة" : "غير مفعّلة";
+            delBadge.className = `security-status-badge ${hasDelPwd ? "is-enabled" : "is-disabled"}`;
+        }
+        if (delDis) delDis.style.display = hasDelPwd ? "none" : "flex";
+        if (delEn) delEn.style.display = hasDelPwd ? "flex" : "none";
+    }
+
+    function enableSecurityPassword(target) {
+        const inpId = target === "appLock" ? "newAppLockPwdInput" : "newDeletePwdInput";
+        const inp = document.getElementById(inpId);
+        const val = (inp ? inp.value : "").trim();
+        if (!val) {
+            displayToast("يرجى إدخال كلمة المرور أولاً", true);
+            if (inp) inp.focus();
+            return;
+        }
+        if (target === "appLock") {
+            appLockPassword = val;
+            isAppUnlockedThisSession = true;
+            UnifiedStorage.save("app_lock_password_v1", appLockPassword);
+            displayToast("تم تفعيل قفل الدخول للبرنامج");
+        } else {
+            deletePassword = val;
+            UnifiedStorage.save("delete_password_v1", deletePassword);
+            displayToast("تم تفعيل حماية عمليات الحذف");
+        }
+        if (inp) inp.value = "";
+        renderSecuritySettingsUI();
+        pushCloudSync();
+    }
+
+    function openSecurityActionPrompt(target, action) {
+        pendingSecurityVerifyTarget = target;
+        pendingSecurityVerifyAction = action;
+        const titleEl = document.getElementById("secVerifyModalTitle");
+        const curInp = document.getElementById("secVerifyCurrentInput");
+        const newGrp = document.getElementById("secVerifyNewGroup");
+        const newInp = document.getElementById("secVerifyNewInput");
+        const errEl = document.getElementById("secVerifyErrorMsg");
+        const btnEl = document.getElementById("secVerifyConfirmBtn");
+
+        const targetLabel = target === "appLock" ? "قفل الدخول" : "حماية الحذف";
+        if (titleEl) titleEl.innerText = action === "change" ? `تغيير كلمة مرور ${targetLabel}` : `إلغاء ${targetLabel}`;
+        if (newGrp) newGrp.style.display = action === "change" ? "flex" : "none";
+        if (curInp) curInp.value = "";
+        if (newInp) newInp.value = "";
+        if (errEl) errEl.style.display = "none";
+        if (btnEl) {
+            btnEl.innerText = action === "change" ? "حفظ كلمة المرور الجديدة" : "تأكيد إلغاء الحماية";
+            btnEl.style.background = action === "change" ? "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)" : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)";
+        }
+        openGlassModal("securityVerifyModal");
+        if (curInp) setTimeout(() => curInp.focus(), 80);
+    }
+
+    function submitSecurityVerifyAction() {
+        const curInp = document.getElementById("secVerifyCurrentInput");
+        const newInp = document.getElementById("secVerifyNewInput");
+        const errEl = document.getElementById("secVerifyErrorMsg");
+        const enteredCur = curInp ? curInp.value : "";
+        const actualCur = pendingSecurityVerifyTarget === "appLock" ? appLockPassword : deletePassword;
+
+        if (enteredCur !== actualCur) {
+            if (errEl) {
+                errEl.innerText = "كلمة المرور الحالية غير صحيحة!";
+                errEl.style.display = "block";
+            }
+            displayToast("كلمة المرور الحالية غير صحيحة!", true);
+            if (curInp) curInp.focus();
+            return;
+        }
+
+        if (pendingSecurityVerifyAction === "change") {
+            const newVal = (newInp ? newInp.value : "").trim();
+            if (!newVal) {
+                if (errEl) {
+                    errEl.innerText = "يرجى إدخال كلمة المرور الجديدة!";
+                    errEl.style.display = "block";
+                }
+                if (newInp) newInp.focus();
+                return;
+            }
+            if (pendingSecurityVerifyTarget === "appLock") {
+                appLockPassword = newVal;
+                isAppUnlockedThisSession = true;
+                UnifiedStorage.save("app_lock_password_v1", appLockPassword);
+            } else {
+                deletePassword = newVal;
+                UnifiedStorage.save("delete_password_v1", deletePassword);
+            }
+            displayToast("تم تغيير كلمة المرور بنجاح");
+        } else {
+            if (pendingSecurityVerifyTarget === "appLock") {
+                appLockPassword = "";
+                UnifiedStorage.save("app_lock_password_v1", "");
+            } else {
+                deletePassword = "";
+                UnifiedStorage.save("delete_password_v1", "");
+            }
+            displayToast("تم إلغاء الحماية بنجاح");
+        }
+
+        closeGlassModal("securityVerifyModal");
+        renderSecuritySettingsUI();
+        pushCloudSync();
+    }
+
+    function initCloudSync() {
+        const devId = getOrCreateDeviceId();
+        if (typeof firebase === "undefined" || !firebase.initializeApp || !firebase.firestore) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+            return;
+        }
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            firestoreDb = firebase.firestore();
+            firestoreDb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+            window.addEventListener("online", () => updateCloudSyncBadge(true, "متصل بالسحابة"));
+            window.addEventListener("offline", () => updateCloudSyncBadge(false, "حفظ محلي"));
+
+            const docRef = firestoreDb.collection("cashmate_devices").doc(devId);
+            docRef.get().then((docSnap) => {
+                if (!docSnap.exists) {
+                    const hasLocalData = allTransactions.length > 0 || clientTransactions.length > 0 || savedClients.length > 0 || Boolean(customAppTitle);
+                    if (hasLocalData) {
+                        pushCloudSync();
+                    } else {
+                        pushCloudSync();
+                    }
+                } else {
+                    const data = docSnap.data();
+                    if (data) {
+                        const cloudEmpty = (!Array.isArray(data.transactions) || data.transactions.length === 0) &&
+                                           (!Array.isArray(data.clientTransactions) || data.clientTransactions.length === 0);
+                        const hasLocalData = allTransactions.length > 0 || clientTransactions.length > 0;
+                        if (cloudEmpty && hasLocalData) {
+                            pushCloudSync();
+                        } else {
+                            applyCloudPayload(data);
+                        }
+                    }
+                    updateCloudSyncBadge(true, "متصل بالسحابة");
+                }
+                attachDeviceRealtimeListener(devId);
+            }).catch(() => {
+                updateCloudSyncBadge(false, "حفظ محلي");
+                attachDeviceRealtimeListener(devId);
+            });
+        } catch(e) {
+            updateCloudSyncBadge(false, "حفظ محلي");
+        }
+    }
+
+    function copyDeviceIdToClipboard() {
+        const code = currentDeviceId || getOrCreateDeviceId();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(() => {
+                displayToast("تم نسخ كود الجهاز: " + code);
+            }).catch(() => {
+                displayToast("كود الجهاز: " + code);
+            });
+        } else {
+            displayToast("كود الجهاز: " + code);
+        }
+    }
+
+    function linkAndRestoreDeviceId() {
+        const inp = document.getElementById("linkOtherDeviceIdInput");
+        const newId = (inp ? inp.value : "").trim().toUpperCase();
+        if (!newId) {
+            displayToast("يرجى إدخال كود الجهاز المطلوب ربطه", true);
+            return;
+        }
+        if (!firestoreDb) {
+            displayToast("تعذر الاتصال بقاعدة البيانات السحابية حالياً", true);
+            return;
+        }
+        firestoreDb.collection("cashmate_devices").doc(newId).get().then((docSnap) => {
+            if (!docSnap.exists) {
+                displayToast("لم يتم العثور على بيانات لهذا الكود: " + newId, true);
+                return;
+            }
+            const data = docSnap.data();
+            currentDeviceId = newId;
+            try { localStorage.setItem("cashmate_device_id", newId); } catch(e) {}
+            const disp = document.getElementById("settingsCurrentDeviceId");
+            if (disp) disp.innerText = newId;
+            if (inp) inp.value = "";
+            applyCloudPayload(data);
+            attachDeviceRealtimeListener(newId);
+            updateCloudSyncBadge(true, "متصل ومزامن");
+            displayToast("تم ربط الجهاز واستعادة البيانات بنجاح");
+        }).catch(() => {
+            displayToast("حدث خطأ أثناء الاتصال بالسحابة، تحقق من الإنترنت", true);
+        });
+    }
 
     // =========================================================================
     // تهيئة تطبيق الويب التقدمي (PWA) داخل الملف الواحد (Manifest + SW + Install)
