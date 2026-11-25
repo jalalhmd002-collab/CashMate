@@ -110,34 +110,48 @@
             return;
         }
 
+        const saveCallback = () => {
+            registerNewCategoryIfMissing(category, quickComposerType);
+            allTransactions.unshift({
+                id: Date.now(),
+                amount,
+                wallet,
+                category,
+                type: quickComposerType,
+                date,
+                note: ""
+            });
+
+            saveStorage();
+            if (amtInp) amtInp.value = "";
+            if (catInp) catInp.value = "";
+            displayToast("تم حفظ الحركة بنجاح");
+            renderMainState();
+        };
+
         if (quickComposerType === "EXPENSE") {
             const availBal = getWalletBalance(wallet, null);
-            if (availBal <= 0) {
-                displayToast(`لا يمكن الصرف من وسيلة (${wallet})؛ رصيدها فارغ (0.00)!`, true);
-                return;
-            }
-            if (amount > availBal) {
-                displayToast(`المبلغ المطلوب أكبر من الرصيد المتوفر في (${wallet}) وهو (${availBal.toLocaleString('en-US', {maximumFractionDigits: 2})})!`, true);
+            if (normalizeWalletName(wallet) !== "كاش") {
+                if (availBal <= 0) {
+                    displayToast(`لا يمكن الصرف من وسيلة (${wallet})؛ رصيدها فارغ (0.00)!`, true);
+                    return;
+                }
+                if (amount > availBal) {
+                    displayToast(`المبلغ المطلوب أكبر من الرصيد المتوفر في (${wallet}) وهو (${availBal.toLocaleString('en-US', {maximumFractionDigits: 2})})!`, true);
+                    return;
+                }
+            } else if (amount > availBal) {
+                promptConfirmDialog(
+                    "تنبيه: الصرف بالدَّين من الكاش",
+                    "رصيد الكاش المتوفر (" + availBal.toLocaleString('en-US', {maximumFractionDigits: 2}) + ") أقل من المبلغ المطلوب. سيصبح رصيد الكاش (" + (Math.round((availBal - amount) * 100) / 100).toLocaleString('en-US', {maximumFractionDigits: 2}) + ") كعجز على الصندوق. هل تريد المتابعة؟",
+                    saveCallback,
+                    false
+                );
                 return;
             }
         }
 
-        registerNewCategoryIfMissing(category, quickComposerType);
-        allTransactions.unshift({
-            id: Date.now(),
-            amount,
-            wallet,
-            category,
-            type: quickComposerType,
-            date,
-            note: ""
-        });
-
-        saveStorage();
-        if (amtInp) amtInp.value = "";
-        if (catInp) catInp.value = "";
-        displayToast("تم حفظ الحركة بنجاح");
-        renderMainState();
+        saveCallback();
     }
 
     // أدوات معالجة الأرقام والنصوص والأمان
@@ -1478,8 +1492,14 @@
         const badge = document.getElementById("modalWalletBalIndicator");
         if (!badge) return;
         const bal = getWalletBalance(wallet, editingRecordId);
-        if (modalActiveTxType === "EXPENSE") {
-            if (bal <= 0) {
+        if (bal < 0) {
+            badge.style.color = "var(--neon-red)";
+            badge.innerText = `(عجز حالي: ${bal.toLocaleString("en-US", {maximumFractionDigits: 2})})`;
+        } else if (modalActiveTxType === "EXPENSE") {
+            if (bal === 0 && normalizeWalletName(wallet) === "كاش") {
+                badge.style.color = "var(--neon-amber)";
+                badge.innerText = "(رصيد 0.00 • متاح بالدَّين)";
+            } else if (bal <= 0) {
                 badge.style.color = "var(--neon-red)";
                 badge.innerText = "(رصيد فارغ: 0.00)";
             } else {
@@ -2790,37 +2810,51 @@
         if (isNaN(amount) || amount <= 0) { displayToast("يرجى إدخال مبلغ صحيح أكبر من صفر", true); return; }
         if (!category) { displayToast("يرجى إدخال أو اختيار التصنيف", true); return; }
 
+        const saveCallback = () => {
+            registerNewCategoryIfMissing(category, modalActiveTxType);
+
+            if (editingRecordId != null) {
+                const idx = allTransactions.findIndex(t => t.id == editingRecordId);
+                if (idx !== -1) {
+                    const updatedTx = { ...allTransactions[idx], amount, category, type: modalActiveTxType, wallet, date, note };
+                    if (updatedTx.client && !updatedTx.isPayment && updatedTx.reqAmount !== undefined) {
+                        updatedTx.debtAmount = Math.max(0, Number(updatedTx.reqAmount) - amount);
+                    }
+                    allTransactions[idx] = updatedTx;
+                    displayToast("تم تحديث الحركة بنجاح");
+                }
+                editingRecordId = null;
+            } else {
+                allTransactions.unshift({ id: Date.now(), amount, wallet, category, type: modalActiveTxType, date, time: formatCurrentTime12h(), note });
+                displayToast("تم حفظ الحركة بنجاح");
+            }
+
+            saveStorage();
+            closeGlassModal("addTxModalSheet");
+            renderMainState();
+            const catDetailModal = document.getElementById("categoryDetailModal");
+            if (catDetailModal && catDetailModal.classList.contains("is-active-modal")) {
+                renderCategoryDetailModalContent();
+            }
+        };
+
         if (modalActiveTxType === "EXPENSE") {
             const availBal = getWalletBalance(wallet, editingRecordId);
-            if (availBal <= 0) { displayToast(`لا يمكن الصرف من وسيلة (${wallet})؛ رصيدها فارغ (0.00)!`, true); return; }
-            if (amount > availBal) { displayToast(`المبلغ المطلوب (${amount.toLocaleString('en-US')}) أكبر من الرصيد المتوفر في (${wallet}) وهو (${availBal.toLocaleString('en-US', {maximumFractionDigits: 2})})!`, true); return; }
-        }
-
-        registerNewCategoryIfMissing(category, modalActiveTxType);
-
-        if (editingRecordId != null) {
-            const idx = allTransactions.findIndex(t => t.id == editingRecordId);
-            if (idx !== -1) {
-                const updatedTx = { ...allTransactions[idx], amount, category, type: modalActiveTxType, wallet, date, note };
-                if (updatedTx.client && !updatedTx.isPayment && updatedTx.reqAmount !== undefined) {
-                    updatedTx.debtAmount = Math.max(0, Number(updatedTx.reqAmount) - amount);
-                }
-                allTransactions[idx] = updatedTx;
-                displayToast("تم تحديث الحركة بنجاح");
+            if (normalizeWalletName(wallet) !== "كاش") {
+                if (availBal <= 0) { displayToast(`لا يمكن الصرف من وسيلة (${wallet})؛ رصيدها فارغ (0.00)!`, true); return; }
+                if (amount > availBal) { displayToast(`المبلغ المطلوب (${amount.toLocaleString('en-US')}) أكبر من الرصيد المتوفر في (${wallet}) وهو (${availBal.toLocaleString('en-US', {maximumFractionDigits: 2})})!`, true); return; }
+            } else if (amount > availBal) {
+                promptConfirmDialog(
+                    "تنبيه: الصرف بالدَّين من الكاش",
+                    "رصيد الكاش المتوفر (" + availBal.toLocaleString('en-US', {maximumFractionDigits: 2}) + ") أقل من المبلغ المطلوب. سيصبح رصيد الكاش (" + (Math.round((availBal - amount) * 100) / 100).toLocaleString('en-US', {maximumFractionDigits: 2}) + ") كعجز على الصندوق. هل تريد المتابعة؟",
+                    saveCallback,
+                    false
+                );
+                return;
             }
-            editingRecordId = null;
-        } else {
-            allTransactions.unshift({ id: Date.now(), amount, wallet, category, type: modalActiveTxType, date, time: formatCurrentTime12h(), note });
-            displayToast("تم حفظ الحركة بنجاح");
         }
 
-        saveStorage();
-        closeGlassModal("addTxModalSheet");
-        renderMainState();
-        const catDetailModal = document.getElementById("categoryDetailModal");
-        if (catDetailModal && catDetailModal.classList.contains("is-active-modal")) {
-            renderCategoryDetailModalContent();
-        }
+        saveCallback();
     }
 
     function openClientInvoiceModal(defaultClient = "") {
