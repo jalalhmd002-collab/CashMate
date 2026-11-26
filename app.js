@@ -186,7 +186,7 @@
 
     function parseNumberSafe(val, defaultVal = 0) {
         if (val === null || val === undefined) return defaultVal;
-        const clean = normalizeArabicNumbers(val).trim();
+        const clean = normalizeArabicNumbers(val).replace(/,/g, "").trim();
         if (!clean) return defaultVal;
         const num = parseFloat(clean);
         return isNaN(num) ? defaultVal : num;
@@ -386,13 +386,65 @@
         }
     }
 
+    function formatNumberWithCommas(rawVal) {
+        let sanitized = normalizeArabicNumbers(rawVal).replace(/[^0-9.]/g, "");
+        if (!sanitized) return "";
+        const firstDot = sanitized.indexOf(".");
+        let intPart = sanitized;
+        let decPart = "";
+        let hasDot = false;
+        if (firstDot !== -1) {
+            hasDot = true;
+            intPart = sanitized.slice(0, firstDot);
+            decPart = sanitized.slice(firstDot + 1).replace(/\./g, "");
+        }
+        if (/^0[0-9]/.test(intPart)) {
+            intPart = intPart.replace(/^0+(?=[0-9])/, "");
+        }
+        if (hasDot && intPart === "") intPart = "0";
+        const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return hasDot ? `${formattedInt}.${decPart}` : formattedInt;
+    }
+
     function handleNumberInputInput(el) {
         if (!el) return;
-        const normalized = normalizeArabicNumbers(el.value);
-        if (normalized !== el.value) el.value = normalized;
-        if (/^0[0-9]/.test(el.value)) el.value = el.value.replace(/^0+/, "");
+        const raw = String(el.value || "");
+        const selStart = typeof el.selectionStart === "number" ? el.selectionStart : raw.length;
+        const meaningfulBefore = normalizeArabicNumbers(raw.slice(0, selStart)).replace(/[^0-9.]/g, "").length;
+
+        const formatted = formatNumberWithCommas(raw);
+        if (formatted !== el.value) {
+            el.value = formatted;
+            if (typeof el.setSelectionRange === "function") {
+                let count = 0;
+                let newPos = 0;
+                while (newPos < formatted.length && count < meaningfulBefore) {
+                    if (/[0-9.]/.test(formatted[newPos])) count++;
+                    newPos++;
+                }
+                try { el.setSelectionRange(newPos, newPos); } catch (err) {}
+            }
+        }
         if (el.id === "invTotalAmount" || el.id === "invPaidAmount") recalcInvoiceDebtPreview();
     }
+
+    document.addEventListener("keydown", function(e) {
+        const el = e.target;
+        if (!el || el.tagName !== "INPUT" || el.getAttribute("inputmode") !== "decimal") return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const navKeys = ["Backspace", "Delete", "Tab", "Escape", "Enter", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+        if (navKeys.includes(e.key)) return;
+        if (/^[0-9\u0660-\u0669\u06F0-\u06F9]$/.test(e.key)) return;
+        if (e.key === "." && !String(el.value || "").includes(".")) return;
+        e.preventDefault();
+    });
+
+    document.addEventListener("paste", function(e) {
+        const el = e.target;
+        if (el && el.tagName === "INPUT" && el.getAttribute("inputmode") === "decimal") {
+            setTimeout(() => handleNumberInputInput(el), 0);
+        }
+    });
 
     function handleCategoryInputFocus(el) {
         if (!el) return;
@@ -494,9 +546,10 @@
 
     function applySlateTheme(isSlate, persist = true) {
         document.body.classList.toggle("slate-mode", isSlate);
-        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        const themeColor = isSlate ? "#22252A" : "#F7F7F5";
+        const themeMeta = document.getElementById("theme-color-meta") || document.querySelector('meta[name="theme-color"]');
         if (themeMeta) {
-            themeMeta.setAttribute("content", isSlate ? "#22252A" : "#2563EB");
+            themeMeta.setAttribute("content", themeColor);
         }
         const iconSlot = document.getElementById("slateThemeIconSlot");
         const labelSlot = document.getElementById("slateThemeLabelSlot");
@@ -2645,7 +2698,7 @@
         closeCategoryDropdown();
         document.getElementById("modalSheetFormTitle").innerText = "تعديل حركة مالية";
         document.getElementById("btnSubmitTxRecord").innerText = "تحديث الحركة";
-        document.getElementById("inputTxAmount").value = tx.amount;
+        document.getElementById("inputTxAmount").value = formatNumberWithCommas(tx.amount);
         document.getElementById("inputTxCategory").value = tx.category;
         document.getElementById("inputTxNote").value = tx.note || "";
         setModalTransactionType(tx.type);
@@ -2661,8 +2714,8 @@
         document.getElementById("clientInvoiceModalTitle").innerText = "تعديل فاتورة زبون";
         document.getElementById("btnCommitClientInvoice").innerText = "تحديث الفاتورة";
         document.getElementById("invClientName").value = tx.client || "";
-        document.getElementById("invTotalAmount").value = tx.reqAmount !== undefined ? tx.reqAmount : tx.amount;
-        document.getElementById("invPaidAmount").value = tx.amount;
+        document.getElementById("invTotalAmount").value = formatNumberWithCommas(tx.reqAmount !== undefined ? tx.reqAmount : tx.amount);
+        document.getElementById("invPaidAmount").value = formatNumberWithCommas(tx.amount);
         recalcInvoiceDebtPreview();
         document.getElementById("invDesc").value = tx.note || "";
         if (tx.wallet) document.getElementById("clientInvoiceMethod").value = tx.wallet;
@@ -2677,7 +2730,7 @@
         document.getElementById("clientPaymentModalTitle").innerText = "تعديل سند قبض / سداد دَين";
         document.getElementById("btnCommitClientPayment").innerText = "تحديث سند القبض";
         document.getElementById("payClientName").value = tx.client || "";
-        document.getElementById("clientSettlementAmount").value = tx.amount;
+        document.getElementById("clientSettlementAmount").value = formatNumberWithCommas(tx.amount);
         document.getElementById("clientSettlementDate").value = tx.date;
         document.getElementById("payNote").value = tx.note || "سداد دفعة من الدَّين";
         if (tx.wallet) document.getElementById("clientSettlementMethod").value = tx.wallet;

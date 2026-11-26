@@ -1432,7 +1432,7 @@
             height: 42px;
             border-radius: 12px;
             padding: 0 12px;
-            font-size: 0.92rem;
+            font-size: 0.875rem;
             direction: rtl;
             text-align: right;
             caret-color: var(--accent-primary);
@@ -1483,8 +1483,8 @@
             transform: translateY(-1px);
         }
         .wallet-option-card.is-selected {
-            background: var(--accent-subtle);
-            border-color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.12) !important;
+            border: 1.5px solid #F59E0B !important;
         }
         .wallet-option-card-right { display: flex; align-items: center; gap: 10px; }
         .wallet-option-icon {
@@ -1500,20 +1500,79 @@
             flex-shrink: 0;
         }
         .wallet-option-icon.is-active, .wallet-option-card.is-selected .wallet-option-icon {
-            background: var(--accent-subtle);
-            border-color: var(--accent-border);
-            color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.16);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #D97706;
         }
         .wallet-option-info { display: flex; flex-direction: column; gap: 2px; }
         .wallet-option-name { font-size: 0.92rem; font-weight: 400; color: var(--text-main); }
+        .wallet-option-card.is-selected .wallet-option-name {
+            color: #111827 !important;
+            font-weight: 700 !important;
+        }
+        body.slate-mode .wallet-option-card.is-selected {
+            background: rgba(245, 158, 11, 0.12) !important;
+            border: 1.5px solid #F59E0B !important;
+        }
+        body.slate-mode .wallet-option-card.is-selected .wallet-option-name {
+            color: #FFFFFF !important;
+        }
+        body.slate-mode .wallet-option-card.is-selected .wallet-option-icon {
+            color: #FBBF24;
+        }
         .wallet-option-balance { font-size: 0.76rem; font-weight: 400; direction: ltr; text-align: right; }
         .wallet-option-check { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
+        input,
+        textarea,
+        select {
+            font-size: 0.875rem;
+        }
+        input::placeholder,
+        textarea::placeholder,
+        select::placeholder,
+        .form-input-control::placeholder {
+            font-size: 0.8125rem !important;
+            font-weight: 400 !important;
+        }
         input:focus::placeholder,
         textarea:focus::placeholder,
         .form-input-control:focus::placeholder {
             color: transparent !important;
             opacity: 0 !important;
+        }
+        input[inputmode="decimal"],
+        #inputTxAmount,
+        #invTotalAmount,
+        #invPaidAmount,
+        #clientSettlementAmount {
+            font-size: 1.5rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px !important;
+            height: 48px !important;
+            min-height: 48px !important;
+            box-sizing: border-box !important;
+        }
+        input[inputmode="decimal"]::placeholder,
+        #inputTxAmount::placeholder,
+        #invTotalAmount::placeholder,
+        #invPaidAmount::placeholder,
+        #clientSettlementAmount::placeholder {
+            font-size: 1.45rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+        }
+        .glass-modal-sheet input.form-input-control,
+        .glass-modal-sheet select.form-input-control,
+        .glass-modal-sheet .custom-wallet-trigger-btn,
+        #addTxModalSheet .form-input-control,
+        #clientInvoiceModal .form-input-control {
+            height: 48px !important;
+            min-height: 48px !important;
+            box-sizing: border-box !important;
+        }
+        .dual-split-row {
+            align-items: end;
         }
 
         .searchable-dropdown-wrapper {
@@ -2159,7 +2218,7 @@
             height: auto;
             min-height: 46px;
             padding: 10px 12px;
-            font-size: 0.98rem;
+            font-size: 0.875rem;
         }
         #clientInvoiceModal .category-input-field {
             padding-left: 44px !important;
@@ -2562,7 +2621,7 @@
             height: auto;
             min-height: 46px;
             padding: 10px 12px;
-            font-size: 0.98rem;
+            font-size: 0.875rem;
         }
         #addTxModalSheet .category-input-field {
             padding-left: 44px !important;
@@ -3695,13 +3754,21 @@
             width: 40px !important;
             height: 40px !important;
             border-radius: 12px !important;
-            background: #FFFBEB !important;
-            border: 1px solid #FDE68A !important;
+            background: rgba(245, 158, 11, 0.12) !important;
+            border: 1.5px solid #F59E0B !important;
             color: #D97706 !important;
             box-shadow: none !important;
         }
         .ios-stmt-plus-btn:hover {
-            background: #FEF3C7 !important;
+            background: rgba(245, 158, 11, 0.22) !important;
+        }
+        body.slate-mode .ios-stmt-plus-btn {
+            background: rgba(245, 158, 11, 0.15) !important;
+            border: 1.5px solid #F59E0B !important;
+            color: #F59E0B !important;
+        }
+        body.slate-mode .ios-stmt-plus-btn:hover {
+            background: rgba(245, 158, 11, 0.25) !important;
         }
         .client-statement-header-card .client-trio-metrics {
             background: #F8F9FA !important;
@@ -4120,18 +4187,18 @@
             text-align: center;
         }
         .ios-tile-title {
-            font-size: 1.2rem !important;
+            font-size: 0.95rem !important;
             font-weight: 700 !important;
             line-height: 1.25;
             white-space: nowrap;
         }
         .ios-tile-value {
-            font-size: 1.25rem !important;
-            padding: 4px 14px !important;
+            font-size: 0.85rem !important;
+            padding: 3px 12px !important;
         }
         .ios-tile-sub {
-            font-size: 1.25rem !important;
-            padding: 4px 14px !important;
+            font-size: 0.85rem !important;
+            padding: 3px 12px !important;
             white-space: nowrap;
             max-width: 100%;
             overflow: hidden;
@@ -4777,12 +4844,12 @@
                 gap: 5px;
             }
             .ios-tile-title {
-                font-size: 1.05rem !important;
+                font-size: 0.95rem !important;
                 line-height: 1.25;
             }
             .ios-tile-value,
             .ios-tile-sub {
-                font-size: 1.05rem !important;
+                font-size: 0.85rem !important;
                 padding: 3px 12px !important;
             }
             .home-equations-grid {
