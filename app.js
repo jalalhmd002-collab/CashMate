@@ -545,6 +545,7 @@
     }
 
     function applySlateTheme(isSlate, persist = true) {
+        document.documentElement.classList.toggle("slate-mode", isSlate);
         document.body.classList.toggle("slate-mode", isSlate);
         const themeColor = isSlate ? "#22252A" : "#F7F7F5";
         const themeMeta = document.getElementById("theme-color-meta") || document.querySelector('meta[name="theme-color"]');
@@ -3200,6 +3201,10 @@
 
     function exportDataJSON() {
         try {
+            const customerAvatarsObj = {};
+            customerAvatarsCache.forEach((dataUrl, key) => {
+                if (key && dataUrl) customerAvatarsObj[key] = dataUrl;
+            });
             const dataToExport = {
                 appTitle: customAppTitle,
                 transactions: allTransactions,
@@ -3209,6 +3214,7 @@
                 incomeCategories: savedIncomeCategories,
                 clients: savedClients,
                 archived: archivedClients,
+                customerAvatars: customerAvatarsObj,
                 exportDate: formatISODate(new Date())
             };
             const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json;charset=utf-8;" });
@@ -3248,6 +3254,19 @@
                     }
                     if (Array.isArray(parsed.clients)) savedClients = parsed.clients;
                     if (Array.isArray(parsed.archived)) archivedClients = parsed.archived;
+                    if (parsed.customerAvatars && typeof parsed.customerAvatars === "object") {
+                        const entries = Object.entries(parsed.customerAvatars).filter(([k, v]) => k && typeof v === "string" && v.startsWith("data:image/"));
+                        if (entries.length > 0) {
+                            entries.forEach(([k, v]) => customerAvatarsCache.set(normalizeAvatarClientKey(k), v));
+                            openAvatarDB().then(db => {
+                                const tx = db.transaction(AVATAR_STORE_NAME, "readwrite");
+                                const store = tx.objectStore(AVATAR_STORE_NAME);
+                                entries.forEach(([k, v]) => {
+                                    store.put({ key: normalizeAvatarClientKey(k), dataUrl: v, updatedAt: Date.now() });
+                                });
+                            }).catch(() => {});
+                        }
+                    }
                     saveWalletsStorage();
                     saveExpenseCategoriesStorage();
                     saveIncomeCategoriesStorage();
@@ -3374,7 +3393,7 @@
             openClientInvoiceModal();
             const el = document.getElementById("invTotalAmount");
             if (el && val > 0) {
-                el.value = val;
+                el.value = formatNumberWithCommas(val);
                 recalcInvoiceDebtPreview();
             }
             return;
@@ -3382,13 +3401,13 @@
         if (target === "expense") {
             openAddTransactionModal("EXPENSE");
             const amtInp = document.getElementById("inputTxAmount");
-            if (amtInp && val > 0) amtInp.value = val;
+            if (amtInp && val > 0) amtInp.value = formatNumberWithCommas(val);
             return;
         }
         if (target === "income") {
             openAddTransactionModal("INCOME");
             const amtInp = document.getElementById("inputTxAmount");
-            if (amtInp && val > 0) amtInp.value = val;
+            if (amtInp && val > 0) amtInp.value = formatNumberWithCommas(val);
             return;
         }
 
@@ -3399,14 +3418,14 @@
 
             if (invModal && invModal.classList.contains("is-active-modal")) {
                 const el = document.getElementById("invTotalAmount");
-                if (el) { el.value = val; recalcInvoiceDebtPreview(); }
+                if (el) { el.value = formatNumberWithCommas(val); recalcInvoiceDebtPreview(); }
             } else if (payModal && payModal.classList.contains("is-active-modal")) {
                 const el = document.getElementById("clientSettlementAmount");
-                if (el) el.value = val;
+                if (el) el.value = formatNumberWithCommas(val);
             } else {
                 if (!txModal || !txModal.classList.contains("is-active-modal")) openAddTransactionModal();
                 const amtInp = document.getElementById("inputTxAmount");
-                if (amtInp) amtInp.value = val;
+                if (amtInp) amtInp.value = formatNumberWithCommas(val);
             }
         }
     }
@@ -3834,7 +3853,48 @@
     function refreshAllCustomerAvatarViews() {
         updateInvoiceModalAvatarPreview();
         if (activeStatementClient) updateStatementAvatarPreview(activeStatementClient);
-        if (typeof renderClientMovements === "function") renderClientMovements();
+        renderMainState();
+    }
+
+    function shareClientStatementWhatsApp() {
+        if (!activeStatementClient) return;
+        const appName = (customAppTitle || "").trim() || "إدارة الأموال والمصاريف";
+        const metrics = computeClientLedger(activeStatementClient);
+        const todayStr = formatISODate(new Date());
+        const fmt = (n) => Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+        const balanceLine = metrics.credit > 0
+            ? `✅ *رصيد موجب (للزبون):* +${fmt(metrics.credit)}`
+            : `⚠️ *الدين المتبقي:* ${fmt(metrics.debt)}`;
+
+        const recentTx = clientTransactions
+            .filter(t => t.client === activeStatementClient)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5);
+
+        let lines = [
+            `📊 *كشف حساب زبون - ${appName}*`,
+            `👤 *الزبون:* ${activeStatementClient}`,
+            `📅 *التاريخ:* ${todayStr}`,
+            `───────────────`,
+            `💰 *المطلوب الكلي:* ${fmt(metrics.req)}`,
+            `💵 *المدفوع:* ${fmt(metrics.paid)}`,
+            balanceLine
+        ];
+
+        if (recentTx.length > 0) {
+            lines.push(`───────────────`);
+            lines.push(`🧾 *آخر الحركات:*`);
+            recentTx.forEach(t => {
+                const kind = t.isPayment ? "سند قبض" : "فاتورة";
+                const noteTxt = t.note ? ` (${t.note})` : "";
+                lines.push(`• ${t.date || ""} | ${kind}: ${fmt(t.amount)}${noteTxt}`);
+            });
+        }
+
+        const text = lines.join("\n");
+        const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(waUrl, "_blank", "noopener,noreferrer");
     }
 
     function triggerCustomerAvatarUpload(clientName) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "cashmate-v5";
+const CACHE_NAME = "cashmate-v6";
 
 const CORE_ASSETS = [
   "./",
@@ -7,6 +7,8 @@ const CORE_ASSETS = [
   "./firebase-sync.js",
   "./app.js",
   "./manifest.json",
+  "./logo-coin.png",
+  "./apple-touch-icon.png",
   "./icon-192.png",
   "./icon-512.png"
 ];
