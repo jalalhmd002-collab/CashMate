@@ -452,12 +452,21 @@
 
                 <div class="client-statement-header-card">
                     <div class="client-stmt-name-bar">
-                        <div class="client-stmt-identity-right">
-                            <span class="apple-client-user-squircle">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </span>
-                            <div class="client-statement-name" id="statementClientName" style="margin-bottom: 0; text-align: right;">اسم الزبون</div>
+                    <div class="client-stmt-identity-right">
+                        <div class="client-avatar-anchor">
+                            <div class="client-avatar-widget is-statement" id="statementClientAvatarBox" onclick="handleCustomerAvatarClick(event, activeStatementClient, 'statementAvatarMenu')" title="صورة الزبون">
+                                <img id="statementClientAvatarImg" class="client-avatar-img" alt="صورة الزبون" style="display:none;">
+                                <span id="statementClientAvatarPlaceholder" class="client-avatar-placeholder">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                </span>
+                            </div>
+                            <div class="client-avatar-popover" id="statementAvatarMenu" onclick="event.stopPropagation()">
+                                <button type="button" class="client-avatar-popover-btn" onclick="closeCustomerAvatarMenus(); triggerCustomerAvatarUpload(activeStatementClient);">تغيير الصورة</button>
+                                <button type="button" class="client-avatar-popover-btn is-danger" onclick="closeCustomerAvatarMenus(); confirmDeleteCustomerAvatar(activeStatementClient);">حذف الصورة</button>
+                            </div>
                         </div>
+                        <div class="client-statement-name" id="statementClientName" style="margin-bottom: 0; text-align: right;">اسم الزبون</div>
+                    </div>
                         <div style="position: relative; flex-shrink: 0;">
                             <button type="button" class="ios-stmt-plus-btn" id="stmtPlusActionBtn" onclick="toggleStatementActionMenu(event)" title="إضافة فاتورة أو سداد للزبون">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -582,9 +591,24 @@
 <div class="glass-modal-backdrop" id="clientInvoiceModal">
     <div class="glass-modal-sheet" onclick="event.stopPropagation()">
         <div class="modal-sheet-header">
-            <span class="modal-sheet-title" id="clientInvoiceModalTitle">فاتورة مبيعات لزبون</span>
+            <div class="invoice-header-title-with-avatar">
+                <div class="client-avatar-anchor">
+                    <div class="client-avatar-widget is-invoice" id="invoiceModalAvatarBox" onclick="handleCustomerAvatarClick(event, getInvoiceAvatarClientName(), 'invoiceAvatarMenu')" title="صورة الزبون">
+                        <img id="invoiceModalAvatarImg" class="client-avatar-img" alt="صورة الزبون" style="display:none;">
+                        <span id="invoiceModalAvatarPlaceholder" class="client-avatar-placeholder">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </span>
+                    </div>
+                    <div class="client-avatar-popover" id="invoiceAvatarMenu" onclick="event.stopPropagation()">
+                        <button type="button" class="client-avatar-popover-btn" onclick="closeCustomerAvatarMenus(); triggerCustomerAvatarUpload(getInvoiceAvatarClientName());">تغيير الصورة</button>
+                        <button type="button" class="client-avatar-popover-btn is-danger" onclick="closeCustomerAvatarMenus(); confirmDeleteCustomerAvatar(getInvoiceAvatarClientName());">حذف الصورة</button>
+                    </div>
+                </div>
+                <span class="modal-sheet-title" id="clientInvoiceModalTitle">فاتورة مبيعات لزبون</span>
+            </div>
             <button class="icon-action-svg-btn" onclick="closeGlassModal('clientInvoiceModal')">✕</button>
         </div>
+        <input type="file" id="customerAvatarFileInput" accept="image/*" style="display:none;" onchange="handleCustomerAvatarFileSelected(event)">
 
         <div class="modal-sheet-scroll-body">
             <div class="form-row-group client-inline-row">
@@ -925,7 +949,7 @@
         </div>
         <div class="confirm-dialog-buttons">
             <button class="confirm-button-unit" onclick="closeGlassModal('confirmAlertModal')">إلغاء</button>
-            <button class="confirm-button-unit danger" onclick="runApprovedAction()">تأكيد</button>
+            <button class="confirm-button-unit danger" id="confirmApprovedBtn" onclick="runApprovedAction()">تأكيد الحذف</button>
         </div>
     </div>
 </div>

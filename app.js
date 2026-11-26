@@ -145,7 +145,8 @@
                     "تنبيه: الصرف بالدَّين من الكاش",
                     "رصيد الكاش المتوفر (" + availBal.toLocaleString('en-US', {maximumFractionDigits: 2}) + ") أقل من المبلغ المطلوب. سيصبح رصيد الكاش (" + (Math.round((availBal - amount) * 100) / 100).toLocaleString('en-US', {maximumFractionDigits: 2}) + ") كعجز على الصندوق. هل تريد المتابعة؟",
                     saveCallback,
-                    false
+                    false,
+                    "متابعة"
                 );
                 return;
             }
@@ -525,6 +526,7 @@
 
     function initApplication() {
         initSavedTheme();
+        preloadAllCustomerAvatars();
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().catch(() => {});
         }
@@ -1428,8 +1430,7 @@
             saveExpenseCategoriesStorage();
             displayToast(`تم حذف تصنيف المصروف الفارغ "${c}"`);
         };
-        if (deletePassword) promptConfirmDialog("حذف تصنيف مصروف", `هل تريد حذف التصنيف "${c}"؟`, doDel, true);
-        else doDel();
+        promptConfirmDialog("حذف تصنيف مصروف", `هل أنت متأكد من حذف التصنيف "${c}"؟`, doDel, true, "تأكيد الحذف");
     }
 
     function removeSavedIncomeCategory(c) {
@@ -1448,8 +1449,7 @@
             saveIncomeCategoriesStorage();
             displayToast(`تم حذف تصنيف الدخل الفارغ "${c}"`);
         };
-        if (deletePassword) promptConfirmDialog("حذف تصنيف دخل", `هل تريد حذف التصنيف "${c}"؟`, doDel, true);
-        else doDel();
+        promptConfirmDialog("حذف تصنيف دخل", `هل أنت متأكد من حذف التصنيف "${c}"؟`, doDel, true, "تأكيد الحذف");
     }
 
     function renderDynamicWalletsUI() {
@@ -1964,17 +1964,28 @@
                 if (c) navigateToClientStatement(c);
             };
 
+            const avatarUrl = getCachedCustomerAvatar(t.client || "");
+            const detailsHtml = `
+                <div class="unified-tx-row2">
+                    <span class="unified-tx-type-plain ${isPay ? "green" : "amber"}">${typeText}</span>
+                    ${t.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(t.wallet)}${escapeHTML(normalizeWalletName(t.wallet))}</span>` : ""}
+                </div>
+                <div class="unified-tx-row3">${formatDateWithTime(t)}</div>
+            `;
+            const belowNameHtml = avatarUrl
+                ? `<div class="client-movement-details-inline">
+                       <img src="${avatarUrl}" alt="" class="client-movement-avatar-48">
+                       <div class="client-movement-details-col">${detailsHtml}</div>
+                   </div>`
+                : detailsHtml;
+
             card.innerHTML = `
                 <div class="unified-tx-card-main">
                 <div class="unified-tx-right">
                     <div class="unified-tx-row1">
                         <span class="unified-tx-title">${escapeHTML(t.client || "")}</span>
                     </div>
-                    <div class="unified-tx-row2">
-                        <span class="unified-tx-type-plain ${isPay ? "green" : "amber"}">${typeText}</span>
-                        ${t.wallet ? `<span style="color:var(--text-muted);">•</span><span class="unified-tx-wallet-plain">${getWalletIconEmoji(t.wallet)}${escapeHTML(normalizeWalletName(t.wallet))}</span>` : ""}
-                    </div>
-                    <div class="unified-tx-row3">${formatDateWithTime(t)}</div>
+                    ${belowNameHtml}
                 </div>
                 </div>
                 <div class="unified-tx-left-wrap">
@@ -2361,6 +2372,7 @@
     function renderClientStatement() {
         if (!activeStatementClient) return;
         document.getElementById("statementClientName").innerText = activeStatementClient;
+        updateStatementAvatarPreview(activeStatementClient);
         const metrics = computeClientLedger(activeStatementClient);
         document.getElementById("stmtReqVal").innerText = metrics.req.toLocaleString("en-US", { maximumFractionDigits: 2 });
         document.getElementById("stmtPaidVal").innerText = metrics.paid.toLocaleString("en-US", { maximumFractionDigits: 2 });
@@ -2532,8 +2544,7 @@
             populateClientDropdown(getAllClients());
             displayToast(`تم حذف الزبون الفارغ "${c}"`);
         };
-        if (deletePassword) promptConfirmDialog("حذف زبون", `هل تريد حذف الزبون "${c}"؟`, doDel, true);
-        else doDel();
+        promptConfirmDialog("حذف زبون", `هل أنت متأكد من حذف الزبون "${c}"؟`, doDel, true, "تأكيد الحذف");
     }
 
     function openClientDropdown(populateAll = false, forceShowEmpty = false) {
@@ -2590,15 +2601,18 @@
         const matches = !cleanQuery ? allClients : allClients.filter(c => c.toLowerCase().includes(cleanQuery));
         if (matches.length === 0) {
             closeClientDropdown();
+            updateInvoiceModalAvatarPreview();
             return;
         }
         populateClientDropdown(matches);
+        updateInvoiceModalAvatarPreview();
     }
 
     function selectClientFromDropdown(clientName) {
         const inp = document.getElementById("invClientName");
         if (inp) inp.value = clientName;
         closeClientDropdown();
+        updateInvoiceModalAvatarPreview();
     }
 
     function openAddTransactionModal(defaultType = null) {
@@ -2654,6 +2668,7 @@
         if (tx.wallet) document.getElementById("clientInvoiceMethod").value = tx.wallet;
         syncWalletPickerDisplays();
         populateClientDropdown(getAllClients());
+        updateInvoiceModalAvatarPreview();
         openGlassModal("clientInvoiceModal");
     }
 
@@ -2848,7 +2863,8 @@
                     "تنبيه: الصرف بالدَّين من الكاش",
                     "رصيد الكاش المتوفر (" + availBal.toLocaleString('en-US', {maximumFractionDigits: 2}) + ") أقل من المبلغ المطلوب. سيصبح رصيد الكاش (" + (Math.round((availBal - amount) * 100) / 100).toLocaleString('en-US', {maximumFractionDigits: 2}) + ") كعجز على الصندوق. هل تريد المتابعة؟",
                     saveCallback,
-                    false
+                    false,
+                    "متابعة"
                 );
                 return;
             }
@@ -2870,6 +2886,7 @@
         if (paymentWallets.length > 0) document.getElementById("clientInvoiceMethod").value = paymentWallets[0];
         syncWalletPickerDisplays();
         populateClientDropdown(getAllClients());
+        updateInvoiceModalAvatarPreview();
         openGlassModal("clientInvoiceModal");
     }
 
@@ -3017,9 +3034,11 @@
 
     let pendingConfirmRequiresDeletePwd = false;
 
-    function promptConfirmDialog(title, msg, callback, requireDeletePwd = true) {
+    function promptConfirmDialog(title, msg, callback, requireDeletePwd = true, confirmLabel = "تأكيد الحذف") {
         document.getElementById("confirmBoxHeader").innerText = title;
         document.getElementById("confirmBoxMessage").innerText = msg;
+        const approveBtn = document.getElementById("confirmApprovedBtn");
+        if (approveBtn) approveBtn.innerText = confirmLabel || "تأكيد الحذف";
         pendingConfirmCallback = callback;
         pendingConfirmRequiresDeletePwd = Boolean(requireDeletePwd && deletePassword);
 
@@ -3574,6 +3593,242 @@
         } else if (isIOSDevice) {
             openGlassModal("iosInstallHintModal");
         }
+    }
+
+    const AVATAR_DB_NAME = "cashmate_local_avatars_db";
+    const AVATAR_STORE_NAME = "avatars";
+    const customerAvatarsCache = new Map();
+    let pendingAvatarUploadClient = "";
+
+    function normalizeAvatarClientKey(name) {
+        return String(name || "").trim().replace(/\s+/g, " ").toLowerCase();
+    }
+
+    function openAvatarDB() {
+        return new Promise((resolve, reject) => {
+            if (!window.indexedDB) {
+                reject(new Error("IndexedDB unavailable"));
+                return;
+            }
+            const req = window.indexedDB.open(AVATAR_DB_NAME, 1);
+            req.onupgradeneeded = function(e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(AVATAR_STORE_NAME)) {
+                    db.createObjectStore(AVATAR_STORE_NAME, { keyPath: "key" });
+                }
+            };
+            req.onsuccess = function(e) { resolve(e.target.result); };
+            req.onerror = function() { reject(req.error || new Error("IndexedDB open failed")); };
+        });
+    }
+
+    function preloadAllCustomerAvatars() {
+        openAvatarDB().then(db => {
+            const tx = db.transaction(AVATAR_STORE_NAME, "readonly");
+            const store = tx.objectStore(AVATAR_STORE_NAME);
+            const req = store.getAll();
+            req.onsuccess = function() {
+                const rows = Array.isArray(req.result) ? req.result : [];
+                rows.forEach(item => {
+                    if (item && item.key && item.dataUrl) {
+                        customerAvatarsCache.set(item.key, item.dataUrl);
+                    }
+                });
+                if (rows.length > 0) refreshAllCustomerAvatarViews();
+            };
+        }).catch(() => {});
+    }
+
+    function getCachedCustomerAvatar(clientName) {
+        const key = normalizeAvatarClientKey(clientName);
+        if (!key) return "";
+        return customerAvatarsCache.get(key) || "";
+    }
+
+    function saveCustomerAvatarToDB(clientName, dataUrl) {
+        const key = normalizeAvatarClientKey(clientName);
+        if (!key || !dataUrl) return Promise.resolve();
+        customerAvatarsCache.set(key, dataUrl);
+        refreshAllCustomerAvatarViews();
+        return openAvatarDB().then(db => new Promise((resolve, reject) => {
+            const tx = db.transaction(AVATAR_STORE_NAME, "readwrite");
+            tx.objectStore(AVATAR_STORE_NAME).put({ key, dataUrl, updatedAt: Date.now() });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        }));
+    }
+
+    function deleteCustomerAvatarFromDB(clientName) {
+        const key = normalizeAvatarClientKey(clientName);
+        if (!key) return Promise.resolve();
+        customerAvatarsCache.delete(key);
+        refreshAllCustomerAvatarViews();
+        return openAvatarDB().then(db => new Promise((resolve, reject) => {
+            const tx = db.transaction(AVATAR_STORE_NAME, "readwrite");
+            tx.objectStore(AVATAR_STORE_NAME).delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        }));
+    }
+
+    function compressAvatarImageFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 250;
+                    const srcW = img.naturalWidth || img.width;
+                    const srcH = img.naturalHeight || img.height;
+                    const side = Math.min(srcW, srcH);
+                    const sx = Math.max(0, Math.floor((srcW - side) / 2));
+                    const sy = Math.max(0, Math.floor((srcH - side) / 2));
+                    const outSize = Math.min(maxDim, side);
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = outSize;
+                    canvas.height = outSize;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, sx, sy, side, side, 0, 0, outSize, outSize);
+
+                    let dataUrl = canvas.toDataURL("image/webp", 0.7);
+                    if (!dataUrl || !dataUrl.startsWith("data:image/webp")) {
+                        dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+                    }
+                    resolve(dataUrl);
+                };
+                img.onerror = () => reject(new Error("Invalid image"));
+                img.src = evt.target.result;
+            };
+            reader.onerror = () => reject(new Error("File read error"));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function getInvoiceAvatarClientName() {
+        const inp = document.getElementById("invClientName");
+        return inp ? inp.value.trim() : "";
+    }
+
+    function renderAvatarWidgetState(imgId, placeholderId, clientName) {
+        const imgEl = document.getElementById(imgId);
+        const phEl = document.getElementById(placeholderId);
+        if (!imgEl || !phEl) return;
+
+        const dataUrl = getCachedCustomerAvatar(clientName);
+        if (dataUrl) {
+            imgEl.src = dataUrl;
+            imgEl.style.display = "block";
+            phEl.style.display = "none";
+        } else {
+            imgEl.removeAttribute("src");
+            imgEl.style.display = "none";
+            phEl.style.display = "inline-flex";
+        }
+    }
+
+    function updateInvoiceModalAvatarPreview() {
+        renderAvatarWidgetState(
+            "invoiceModalAvatarImg",
+            "invoiceModalAvatarPlaceholder",
+            getInvoiceAvatarClientName()
+        );
+    }
+
+    function updateStatementAvatarPreview(clientName) {
+        renderAvatarWidgetState(
+            "statementClientAvatarImg",
+            "statementClientAvatarPlaceholder",
+            clientName || activeStatementClient || ""
+        );
+    }
+
+    function closeCustomerAvatarMenus() {
+        document.querySelectorAll(".client-avatar-popover.is-open").forEach(el => {
+            el.classList.remove("is-open");
+        });
+    }
+
+    function handleCustomerAvatarClick(event, clientName, menuId) {
+        if (event) event.stopPropagation();
+        const cleanName = String(clientName || "").trim();
+        if (!cleanName) {
+            closeCustomerAvatarMenus();
+            displayToast("يرجى كتابة أو اختيار اسم الزبون أولاً", true);
+            return;
+        }
+        const existingUrl = getCachedCustomerAvatar(cleanName);
+        if (!existingUrl) {
+            closeCustomerAvatarMenus();
+            triggerCustomerAvatarUpload(cleanName);
+            return;
+        }
+        const menu = document.getElementById(menuId);
+        if (!menu) return;
+        const wasOpen = menu.classList.contains("is-open");
+        closeCustomerAvatarMenus();
+        if (!wasOpen) {
+            menu.classList.add("is-open");
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest || !e.target.closest(".client-avatar-anchor")) {
+            closeCustomerAvatarMenus();
+        }
+    });
+
+    function refreshAllCustomerAvatarViews() {
+        updateInvoiceModalAvatarPreview();
+        if (activeStatementClient) updateStatementAvatarPreview(activeStatementClient);
+        if (typeof renderClientMovements === "function") renderClientMovements();
+    }
+
+    function triggerCustomerAvatarUpload(clientName) {
+        const cleanName = String(clientName || "").trim();
+        if (!cleanName) {
+            displayToast("يرجى كتابة أو اختيار اسم الزبون أولاً", true);
+            return;
+        }
+        pendingAvatarUploadClient = cleanName;
+        const inp = document.getElementById("customerAvatarFileInput");
+        if (inp) {
+            inp.value = "";
+            inp.click();
+        }
+    }
+
+    function handleCustomerAvatarFileSelected(event) {
+        const file = event && event.target && event.target.files ? event.target.files[0] : null;
+        if (!file) return;
+        const targetClient = pendingAvatarUploadClient || getInvoiceAvatarClientName() || activeStatementClient || "";
+        if (!targetClient) return;
+
+        compressAvatarImageFile(file)
+            .then(dataUrl => saveCustomerAvatarToDB(targetClient, dataUrl))
+            .then(() => {
+                displayToast("تم حفظ صورة الزبون محلياً على جهازك");
+            })
+            .catch(() => {
+                displayToast("تعذر معالجة الصورة المحددة", true);
+            });
+        event.target.value = "";
+    }
+
+    function confirmDeleteCustomerAvatar(clientName) {
+        const cleanName = String(clientName || "").trim();
+        if (!cleanName || !getCachedCustomerAvatar(cleanName)) return;
+        promptConfirmDialog(
+            "حذف صورة الزبون",
+            `هل أنت متأكد من حذف صورة الزبون "${cleanName}"؟`,
+            () => {
+                deleteCustomerAvatarFromDB(cleanName)
+                    .then(() => displayToast("تم حذف صورة الزبون"))
+                    .catch(() => displayToast("تعذر حذف الصورة", true));
+            },
+            true,
+            "تأكيد الحذف"
+        );
     }
 
     setupSingleFilePWA();

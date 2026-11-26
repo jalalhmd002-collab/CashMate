@@ -4797,3 +4797,145 @@
                 color: #F8FAFC !important;
             }
         }
+
+        /* تنسيق صور الزبائن المحلية (IndexedDB) */
+        .invoice-header-title-with-avatar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .client-avatar-anchor {
+            position: relative;
+            display: inline-flex;
+            flex-shrink: 0;
+        }
+        .client-avatar-widget {
+            position: relative;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1.5px solid rgba(245, 158, 11, 0.35);
+            color: #D97706;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+        }
+        .client-avatar-widget:hover {
+            transform: scale(1.04);
+            border-color: #F59E0B;
+        }
+        .client-avatar-widget.is-invoice {
+            width: 60px !important;
+            height: 60px !important;
+            min-width: 60px !important;
+            min-height: 60px !important;
+        }
+        .client-avatar-widget.is-statement {
+            width: 72px !important;
+            height: 72px !important;
+            min-width: 72px !important;
+            min-height: 72px !important;
+        }
+        .client-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+        .client-avatar-placeholder {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        .client-avatar-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 148px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 950;
+        }
+        .client-avatar-popover.is-open {
+            display: flex;
+        }
+        .client-avatar-popover-btn {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 0.86rem;
+            font-weight: 600;
+            text-align: right;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .client-avatar-popover-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .client-avatar-popover-btn.is-danger {
+            color: #EF4444;
+        }
+        .client-avatar-popover-btn.is-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .client-movement-details-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .client-movement-avatar-48 {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1.5px solid rgba(245, 158, 11, 0.35);
+        }
+        .client-movement-details-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        body.slate-mode .client-avatar-widget {
+            background: rgba(251, 191, 36, 0.14);
+            border-color: rgba(251, 191, 36, 0.35);
+            color: #FBBF24;
+        }
+        body.slate-mode .client-avatar-popover {
+            background: #2E3238;
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+        }
+        body.slate-mode .client-avatar-popover-btn {
+            color: #F1F5F9;
+        }
+        body.slate-mode .client-avatar-popover-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        body.slate-mode .client-avatar-popover-btn.is-danger {
+            color: #F87171;
+        }
+        body.slate-mode .client-avatar-popover-btn.is-danger:hover {
+            background: rgba(248, 113, 113, 0.14);
+        }
