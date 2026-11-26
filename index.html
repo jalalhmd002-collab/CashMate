@@ -10,8 +10,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="إدارة الأموال">
     <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./icon-192.png">
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=2">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=2">
+    <link rel="shortcut icon" type="image/png" href="./icon-192.png?v=2">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=2">
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -27,7 +29,7 @@
         <div>
             <div class="sidebar-top-row">
                 <div class="sidebar-brand-group">
-                    <button class="brand-ps-badge-btn" onclick="openGlassModal('settingsModal')" title="الإعدادات والبيانات">
+                    <button type="button" class="brand-ps-badge-btn" onclick="toggleSlateTheme()" title="تبديل الوضع الليلي / النهاري">
                         JH
                     </button>
                     <span class="sidebar-brand-title sidebar-hide-on-collapse">الإدارة المالية</span>
@@ -107,7 +109,7 @@
                 </button>
                 <div class="header-app-title-box">
                     <span class="header-apple-squircle-logo" aria-hidden="true">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                        <img src="./icon-192.png?v=2" alt="CashMate" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </span>
                     <span class="header-app-title-text" id="headerAppTitleDisplay"></span>
                 </div>
@@ -716,7 +718,7 @@
 </div>
 
 <!-- Modal 4: الإعدادات والبيانات -->
-<div class="glass-modal-backdrop" id="settingsModal">
+<div class="glass-modal-backdrop" id="settingsModal" onclick="closeGlassModal('settingsModal')">
     <div class="glass-modal-sheet" onclick="event.stopPropagation()">
         <div class="modal-sheet-header">
             <span class="modal-sheet-title">الإعدادات والبيانات</span>

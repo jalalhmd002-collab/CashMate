@@ -3112,6 +3112,20 @@
         closeAllActionMenus();
     }
 
+    document.addEventListener("click", function(e) {
+        const backdrop = e.target;
+        if (
+            backdrop &&
+            backdrop.classList &&
+            backdrop.classList.contains("glass-modal-backdrop") &&
+            backdrop.classList.contains("is-active-modal") &&
+            backdrop.id !== "exitAppConfirmModal" &&
+            backdrop.id !== "appLockScreenOverlay"
+        ) {
+            closeGlassModal(backdrop.id);
+        }
+    });
+
     function exportDataJSON() {
         try {
             const dataToExport = {

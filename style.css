@@ -282,23 +282,33 @@
             width: 36px;
             height: 36px;
             border-radius: 12px;
-            background: var(--accent-subtle);
-            border: 1px solid var(--accent-border);
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
             font-weight: 400;
-            color: var(--accent-primary);
+            color: #2563EB;
             cursor: pointer;
             flex-shrink: 0;
             transition: var(--transition-smooth);
         }
         .brand-ps-badge-btn:hover {
-            background: var(--accent-primary);
+            background: #2563EB;
+            border-color: #2563EB;
             color: #FFFFFF;
         }
         .brand-ps-badge-btn:active { transform: scale(0.95); }
+        body.slate-mode .brand-ps-badge-btn {
+            background: #343940 !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: #F1F5F9 !important;
+        }
+        body.slate-mode .brand-ps-badge-btn:hover {
+            background: #3F4650 !important;
+            color: #FFFFFF !important;
+        }
 
         .sidebar-brand-title {
             font-size: 0.95rem;
@@ -4602,6 +4612,16 @@
             border-color: rgba(96, 165, 250, 0.2) !important;
         }
 
+        body.slate-mode #clientsFullView .subpage-header-nav,
+        body.slate-mode #clientStatementView .subpage-header-nav {
+            background: linear-gradient(145deg, #343028 0%, #2E3238 100%) !important;
+            border-color: rgba(251, 191, 36, 0.25) !important;
+            color: #FBBF24 !important;
+        }
+        body.slate-mode #clientsFullView .subpage-header-nav .subpage-header-title,
+        body.slate-mode #clientStatementView .subpage-header-nav .subpage-header-title {
+            color: #FBBF24 !important;
+        }
         body.slate-mode #expenseFullView .subpage-header-nav {
             background: linear-gradient(145deg, #352C2F 0%, #2E3238 100%) !important;
             border-color: rgba(248, 113, 113, 0.22) !important;
@@ -4690,15 +4710,20 @@
             background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
             color: #FFFFFF !important;
         }
-        body.slate-mode .device-id-display-row,
-        body.slate-mode .security-sub-box,
         body.slate-mode .confirm-dialog-wrapper,
         body.slate-mode .toast-neon-box {
             background: #2E3238 !important;
             border-color: rgba(255, 255, 255, 0.08) !important;
             color: #F1F5F9 !important;
         }
+        body.slate-mode .cloud-sync-card,
+        body.slate-mode .device-id-display-row,
         body.slate-mode .security-settings-card,
+        body.slate-mode .security-sub-box {
+            background: #343940 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
         body.slate-mode .security-status-badge.is-disabled,
         body.slate-mode .type-pill-btn,
         body.slate-mode .section-income-pill-btn,
