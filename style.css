@@ -4365,6 +4365,24 @@
         }
         .device-copy-btn:hover { background: #DBEAFE; }
         .device-copy-btn:active { transform: scale(0.95); }
+        .device-return-orig-btn {
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            background: rgba(245, 158, 11, 0.14);
+            color: #D97706;
+            font-size: 0.78rem;
+            font-weight: 700 !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            transition: var(--transition-smooth);
+        }
+        .device-return-orig-btn:hover { background: rgba(245, 158, 11, 0.24); }
+        .device-return-orig-btn:active { transform: scale(0.95); }
 
         /* بطاقة الأمان وكلمات المرور + شاشة قفل الدخول بأسلوب Apple */
         .security-settings-card {
@@ -4845,6 +4863,14 @@
         body.slate-mode .security-action-btn.is-change {
             background: rgba(59, 130, 246, 0.18) !important;
             color: #93C5FD !important;
+        }
+        body.slate-mode .device-return-orig-btn {
+            background: rgba(245, 158, 11, 0.18) !important;
+            border-color: rgba(251, 191, 36, 0.35) !important;
+            color: #FBBF24 !important;
+        }
+        body.slate-mode .device-return-orig-btn:hover {
+            background: rgba(245, 158, 11, 0.28) !important;
         }
         body.slate-mode .app-lock-overlay {
             background: rgba(34, 37, 42, 0.94) !important;

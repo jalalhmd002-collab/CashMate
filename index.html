@@ -845,7 +845,10 @@
                         <span style="font-size:0.74rem; color:var(--text-muted);">كود هذا الجهاز:</span>
                         <span class="device-id-code-txt" id="settingsCurrentDeviceId">DEV-000000</span>
                     </div>
-                    <button type="button" class="device-copy-btn" onclick="copyDeviceIdToClipboard()">نسخ الكود</button>
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+                        <button type="button" class="device-copy-btn" onclick="copyDeviceIdToClipboard()">نسخ الكود</button>
+                        <button type="button" class="device-return-orig-btn" id="returnOriginalDeviceBtn" style="display:none;" onclick="returnToOriginalDeviceId()">العودة لجهازي الأصلي</button>
+                    </div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:5px;">
                     <span style="font-size:0.78rem; color:var(--text-secondary); font-weight:700 !important;">ربط جهاز آخر / استعادة حساب:</span>
