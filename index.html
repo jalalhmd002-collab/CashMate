@@ -139,25 +139,53 @@
                     </div>
                 </div>
 
-                <!-- بطاقة الموقف العام للمحل (عمودان: الرصيد الكلي + إجمالي الديون) -->
-                <div class="home-top-overview-card" id="homeTopOverviewCard">
-                    <div class="home-overview-col">
-                        <div class="home-overview-head">
-                            <span class="apple-summary-squircle green" style="width: 30px; height: 30px; border-radius: 9px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                            </span>
-                            <span class="home-overview-title">الرصيد الكلي</span>
+                <!-- بطاقة الموقف العام للمحل (عمودان: الرصيد الكلي + إجمالي الديون) + زر الإجراء السريع -->
+                <div class="home-top-summary-row">
+                    <div class="home-top-overview-card" id="homeTopOverviewCard">
+                        <div class="home-overview-col">
+                            <div class="home-overview-head">
+                                <span class="apple-summary-squircle green" style="width: 30px; height: 30px; border-radius: 9px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                                </span>
+                                <span class="home-overview-title">الرصيد الكلي</span>
+                            </div>
+                            <span class="home-overview-num green" id="homeNetBalanceCardVal">0</span>
                         </div>
-                        <span class="home-overview-num green" id="homeNetBalanceCardVal">0</span>
+                        <div class="home-overview-col">
+                            <div class="home-overview-head">
+                                <span class="apple-summary-squircle amber" style="width: 30px; height: 30px; border-radius: 9px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </span>
+                                <span class="home-overview-title">إجمالي الديون</span>
+                            </div>
+                            <span class="home-overview-num amber" id="homeDebtsBalanceCardVal">0</span>
+                        </div>
                     </div>
-                    <div class="home-overview-col">
-                        <div class="home-overview-head">
-                            <span class="apple-summary-squircle amber" style="width: 30px; height: 30px; border-radius: 9px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            </span>
-                            <span class="home-overview-title">إجمالي الديون</span>
+                    <div class="home-quick-btn-anchor">
+                        <button type="button" class="home-quick-squircle-btn" id="homeQuickActionBtn" data-action="invoice"
+                                oncontextmenu="return false;"
+                                title="ضغطة سريعة للتنفيذ • اضغط مطولاً (ثانية) لتغيير الإجراء">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <span id="homeQuickActionBtnLabel">فاتورة</span>
+                        </button>
+                        <div class="home-quick-popover" id="homeQuickActionMenu" onclick="event.stopPropagation()">
+                            <button type="button" class="home-quick-option" data-action="invoice" onclick="selectHomeQuickAction('invoice')">
+                                <span class="home-quick-dot" style="background:#F59E0B;"></span>
+                                <span>فاتورة</span>
+                            </button>
+                            <button type="button" class="home-quick-option" data-action="payment" onclick="selectHomeQuickAction('payment')">
+                                <span class="home-quick-dot" style="background:#10B981;"></span>
+                                <span>سند قبض</span>
+                            </button>
+                            <button type="button" class="home-quick-option" data-action="expense" onclick="selectHomeQuickAction('expense')">
+                                <span class="home-quick-dot" style="background:#EF4444;"></span>
+                                <span>مصروف</span>
+                            </button>
+                            <button type="button" class="home-quick-option" data-action="income" onclick="selectHomeQuickAction('income')">
+                                <span class="home-quick-dot" style="background:#0EA5E9;"></span>
+                                <span>دخل</span>
+                            </button>
                         </div>
-                        <span class="home-overview-num amber" id="homeDebtsBalanceCardVal">0</span>
                     </div>
                 </div>
 

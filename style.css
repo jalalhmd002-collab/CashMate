@@ -3867,6 +3867,117 @@
         }
 
         /* بطاقة الموقف العام العلوية (عمودان) + بطاقة معادلة اليوم السفلية */
+        .home-top-summary-row {
+            display: flex;
+            align-items: stretch;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .home-top-summary-row .home-top-overview-card {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0;
+            padding: 12px 6px;
+        }
+        .home-quick-btn-anchor {
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+        }
+        .home-quick-squircle-btn {
+            width: 82px;
+            flex-shrink: 0;
+            border-radius: 18px;
+            border: 1.5px solid rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.14);
+            color: #D97706;
+            font-size: 0.86rem;
+            font-weight: 700 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 6px;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+            transition: var(--transition-smooth);
+        }
+        .home-quick-squircle-btn:active { transform: scale(0.96); }
+        .home-quick-squircle-btn[data-action="invoice"] {
+            background: rgba(245, 158, 11, 0.14);
+            border-color: rgba(245, 158, 11, 0.45);
+            color: #D97706;
+        }
+        .home-quick-squircle-btn[data-action="payment"] {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(16, 185, 129, 0.45);
+            color: #059669;
+        }
+        .home-quick-squircle-btn[data-action="expense"] {
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.45);
+            color: #DC2626;
+        }
+        .home-quick-squircle-btn[data-action="income"] {
+            background: rgba(14, 165, 233, 0.14);
+            border-color: rgba(14, 165, 233, 0.45);
+            color: #0284C7;
+        }
+        body.slate-mode .home-quick-squircle-btn[data-action="invoice"] { color: #FBBF24; }
+        body.slate-mode .home-quick-squircle-btn[data-action="payment"] { color: #34D399; }
+        body.slate-mode .home-quick-squircle-btn[data-action="expense"] { color: #F87171; }
+        body.slate-mode .home-quick-squircle-btn[data-action="income"] { color: #38BDF8; }
+        .home-quick-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 142px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 360;
+        }
+        .home-quick-popover.is-open { display: flex; }
+        .home-quick-option {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 0.86rem;
+            font-weight: 700 !important;
+            padding: 8px 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .home-quick-option:hover { background: rgba(0, 0, 0, 0.05); }
+        .home-quick-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        body.slate-mode .home-quick-popover {
+            background: #2E3238;
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+        }
+        body.slate-mode .home-quick-option { color: #F1F5F9; }
+        body.slate-mode .home-quick-option:hover { background: rgba(255, 255, 255, 0.08); }
+
         .home-top-overview-card {
             background: #FFFFFF;
             border: 1px solid rgba(0, 0, 0, 0.05);

@@ -581,6 +581,7 @@
     function initApplication() {
         initSavedTheme();
         preloadAllCustomerAvatars();
+        initHomeQuickAction();
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().catch(() => {});
         }
@@ -3964,6 +3965,86 @@
             "تأكيد الحذف"
         );
     }
+
+    const HOME_QUICK_ACTIONS = {
+        invoice: { label: "فاتورة", run: () => openClientInvoiceModal() },
+        payment: { label: "سند قبض", run: () => openClientPaymentModal() },
+        expense: { label: "مصروف", run: () => openAddTransactionModal("EXPENSE") },
+        income:  { label: "دخل", run: () => openAddTransactionModal("INCOME") }
+    };
+    let activeHomeQuickAction = "invoice";
+    let homeQuickPressTimer = null;
+    let homeQuickLongPressed = false;
+
+    function applyHomeQuickActionUI(key) {
+        const actionKey = HOME_QUICK_ACTIONS[key] ? key : "invoice";
+        activeHomeQuickAction = actionKey;
+        const btn = document.getElementById("homeQuickActionBtn");
+        const lbl = document.getElementById("homeQuickActionBtnLabel");
+        if (btn) btn.setAttribute("data-action", actionKey);
+        if (lbl) lbl.innerText = HOME_QUICK_ACTIONS[actionKey].label;
+    }
+
+    function selectHomeQuickAction(key) {
+        const actionKey = HOME_QUICK_ACTIONS[key] ? key : "invoice";
+        try { localStorage.setItem("cashmate_home_quick_action", actionKey); } catch (e) {}
+        applyHomeQuickActionUI(actionKey);
+        closeHomeQuickPopover();
+    }
+
+    function closeHomeQuickPopover() {
+        const menu = document.getElementById("homeQuickActionMenu");
+        if (menu) menu.classList.remove("is-open");
+    }
+
+    function initHomeQuickAction() {
+        let saved = "invoice";
+        try { saved = localStorage.getItem("cashmate_home_quick_action") || "invoice"; } catch (e) {}
+        applyHomeQuickActionUI(saved);
+
+        const btn = document.getElementById("homeQuickActionBtn");
+        if (!btn) return;
+
+        const clearPressTimer = () => {
+            if (homeQuickPressTimer) {
+                clearTimeout(homeQuickPressTimer);
+                homeQuickPressTimer = null;
+            }
+        };
+
+        btn.addEventListener("pointerdown", function(e) {
+            if (e.button && e.button !== 0) return;
+            clearPressTimer();
+            homeQuickLongPressed = false;
+            homeQuickPressTimer = setTimeout(() => {
+                homeQuickLongPressed = true;
+                const menu = document.getElementById("homeQuickActionMenu");
+                if (menu) menu.classList.add("is-open");
+            }, 1000);
+        });
+
+        ["pointerup", "pointerleave", "pointercancel"].forEach(evtName => {
+            btn.addEventListener(evtName, clearPressTimer);
+        });
+
+        btn.addEventListener("click", function(e) {
+            if (homeQuickLongPressed) {
+                homeQuickLongPressed = false;
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            closeHomeQuickPopover();
+            const cfg = HOME_QUICK_ACTIONS[activeHomeQuickAction] || HOME_QUICK_ACTIONS.invoice;
+            cfg.run();
+        });
+    }
+
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest || !e.target.closest(".home-quick-btn-anchor")) {
+            closeHomeQuickPopover();
+        }
+    });
 
     setupSingleFilePWA();
     window.onload = initApplication;
