@@ -228,6 +228,17 @@
         updateCloudSyncBadge(true, "متصل ومزامن");
     }
 
+    function verifySecurityPasswordThenRun(title, msg, confirmLabel, actionFn) {
+        const activePwd = (typeof deletePassword === "string" && deletePassword)
+            ? deletePassword
+            : ((typeof appLockPassword === "string" && appLockPassword) ? appLockPassword : "");
+        if (activePwd && typeof promptConfirmDialog === "function") {
+            promptConfirmDialog(title, msg, actionFn, true, confirmLabel, activePwd);
+        } else {
+            actionFn();
+        }
+    }
+
     function linkAndRestoreDeviceId() {
         const inp = document.getElementById("linkOtherDeviceIdInput");
         const newId = (inp ? inp.value : "").trim().toUpperCase();
@@ -239,21 +250,29 @@
             displayToast("تعذر الاتصال بقاعدة البيانات السحابية حالياً", true);
             return;
         }
-        if (!getOriginalDeviceId() && currentDeviceId) {
-            try { localStorage.setItem("cashmate_original_device_id", currentDeviceId); } catch(e) {}
-        }
-        firestoreDb.collection("cashmate_devices").doc(newId).get().then((docSnap) => {
-            if (!docSnap.exists) {
-                displayToast("لم يتم العثور على بيانات لهذا الكود: " + newId, true);
-                return;
+        const performLink = () => {
+            if (!getOriginalDeviceId() && currentDeviceId) {
+                try { localStorage.setItem("cashmate_original_device_id", currentDeviceId); } catch(e) {}
             }
-            const data = docSnap.data();
-            if (inp) inp.value = "";
-            applyActiveDeviceSwitch(newId, data);
-            displayToast("تم ربط الجهاز واستعادة البيانات بنجاح");
-        }).catch(() => {
-            displayToast("حدث خطأ أثناء الاتصال بالسحابة، تحقق من الإنترنت", true);
-        });
+            firestoreDb.collection("cashmate_devices").doc(newId).get().then((docSnap) => {
+                if (!docSnap.exists) {
+                    displayToast("لم يتم العثور على بيانات لهذا الكود: " + newId, true);
+                    return;
+                }
+                const data = docSnap.data();
+                if (inp) inp.value = "";
+                applyActiveDeviceSwitch(newId, data);
+                displayToast("تم ربط الجهاز واستعادة البيانات بنجاح");
+            }).catch(() => {
+                displayToast("حدث خطأ أثناء الاتصال بالسحابة، تحقق من الإنترنت", true);
+            });
+        };
+        verifySecurityPasswordThenRun(
+            "تأكيد ربط الجهاز",
+            `هل تريد ربط الجهاز بالكود ${newId} واستعادة بياناته؟`,
+            "تأكيد الربط",
+            performLink
+        );
     }
 
     function returnToOriginalDeviceId() {
@@ -262,22 +281,30 @@
             updateReturnToOriginalDeviceButton();
             return;
         }
-        if (!firestoreDb) {
-            currentDeviceId = origId;
-            try { localStorage.setItem("cashmate_device_id", origId); } catch(e) {}
-            const disp = document.getElementById("settingsCurrentDeviceId");
-            if (disp) disp.innerText = origId;
-            updateReturnToOriginalDeviceButton();
-            displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
-            return;
-        }
-        firestoreDb.collection("cashmate_devices").doc(origId).get().then((docSnap) => {
-            const data = docSnap.exists ? docSnap.data() : null;
-            applyActiveDeviceSwitch(origId, data);
-            displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
-        }).catch(() => {
-            applyActiveDeviceSwitch(origId, null);
-            updateCloudSyncBadge(false, "حفظ محلي");
-            displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
-        });
+        const performReturn = () => {
+            if (!firestoreDb) {
+                currentDeviceId = origId;
+                try { localStorage.setItem("cashmate_device_id", origId); } catch(e) {}
+                const disp = document.getElementById("settingsCurrentDeviceId");
+                if (disp) disp.innerText = origId;
+                updateReturnToOriginalDeviceButton();
+                displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
+                return;
+            }
+            firestoreDb.collection("cashmate_devices").doc(origId).get().then((docSnap) => {
+                const data = docSnap.exists ? docSnap.data() : null;
+                applyActiveDeviceSwitch(origId, data);
+                displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
+            }).catch(() => {
+                applyActiveDeviceSwitch(origId, null);
+                updateCloudSyncBadge(false, "حفظ محلي");
+                displayToast("تمت العودة إلى جهازك الأصلي بنجاح");
+            });
+        };
+        verifySecurityPasswordThenRun(
+            "تأكيد العودة للجهاز الأصلي",
+            `هل تريد العودة إلى جهازك الأصلي (${origId})؟`,
+            "تأكيد العودة",
+            performReturn
+        );
     }

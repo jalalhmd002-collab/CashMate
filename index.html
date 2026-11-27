@@ -124,6 +124,7 @@
             <div class="subpage-view-panel" id="homeMainView">
                 <div class="date-history-row">
                     <button type="button" class="home-day-reset-btn is-active" id="btnHomeDayReset" onclick="selectTimePeriod('day', this)" title="العودة إلى تاريخ اليوم الحالي">يوم</button>
+                    <button type="button" class="home-day-reset-btn" id="btnHomeAllReset" onclick="selectTimePeriod('all', this)" title="عرض إجمالي كل الفترات">الكل</button>
                     <div class="date-stepper-glass" id="dateStepperGlassContainer">
                         <button class="date-arrow-svg-btn" onclick="offsetActiveDate(-1)" title="اليوم السابق">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -834,29 +835,29 @@
             <span class="modal-sheet-title">الأمان والربط</span>
             <button class="icon-action-svg-btn" onclick="closeGlassModal('securitySyncModal')">✕</button>
         </div>
-        <div class="modal-sheet-scroll-body">
+        <div class="modal-sheet-scroll-body" style="padding-bottom: 4px;">
             <div class="cloud-sync-card" id="cloudSyncSettingsCard">
                 <div class="cloud-sync-header">
                     <span class="wallets-manage-title">المزامنة ومعرّف الجهاز</span>
                     <span class="cloud-sync-status-pill is-local" id="cloudSyncStatusBadge">حفظ محلي</span>
                 </div>
                 <div class="device-id-display-row">
-                    <div style="display:flex; flex-direction:column; gap:1px;">
-                        <span style="font-size:0.74rem; color:var(--text-muted);">كود هذا الجهاز:</span>
+                    <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">كود هذا الجهاز:</span>
                         <span class="device-id-code-txt" id="settingsCurrentDeviceId">DEV-000000</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
                         <button type="button" class="device-copy-btn" onclick="copyDeviceIdToClipboard()">نسخ الكود</button>
                         <button type="button" class="device-return-orig-btn" id="returnOriginalDeviceBtn" style="display:none;" onclick="returnToOriginalDeviceId()">العودة لجهازي الأصلي</button>
                     </div>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:5px;">
-                    <span style="font-size:0.78rem; color:var(--text-secondary); font-weight:700 !important;">ربط جهاز آخر / استعادة حساب:</span>
-                    <div class="wallets-add-inline-form">
-                        <input type="text" id="linkOtherDeviceIdInput" class="form-input-control wallets-add-input"
-                               placeholder="أدخل كود الجهاز (مثل DEV-8A4K92)..." dir="ltr" style="text-align:center; text-transform:uppercase;"
+                <div class="security-divider-section">
+                    <span style="font-size:0.82rem; color:var(--text-secondary); font-weight:700 !important;">ربط جهاز آخر / استعادة حساب:</span>
+                    <div class="security-compact-row">
+                        <input type="text" id="linkOtherDeviceIdInput" class="form-input-control security-compact-input"
+                               placeholder="أدخل كود الجهاز (DEV-8A4K92)..." dir="ltr" style="text-align:center; text-transform:uppercase;"
                                autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-                        <button type="button" class="wallets-add-btn" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);" onclick="linkAndRestoreDeviceId()">ربط واستعادة البيانات</button>
+                        <button type="button" class="security-compact-btn is-blue" onclick="linkAndRestoreDeviceId()">ربط واستعادة</button>
                     </div>
                 </div>
             </div>
@@ -869,9 +870,9 @@
                         <span class="security-sub-title">قفل الدخول للبرنامج</span>
                         <span class="security-status-badge is-disabled" id="appLockStatusBadge">غير مفعّلة</span>
                     </div>
-                    <div id="appLockDisabledControls" class="wallets-add-inline-form">
-                        <input type="password" id="newAppLockPwdInput" class="form-input-control wallets-add-input" placeholder="أدخل كلمة مرور الدخول..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('appLock')">
-                        <button type="button" class="wallets-add-btn" onclick="enableSecurityPassword('appLock')">تفعيل وحفظ</button>
+                    <div id="appLockDisabledControls" class="security-compact-row">
+                        <input type="password" id="newAppLockPwdInput" class="form-input-control security-compact-input" placeholder="أدخل كلمة مرور الدخول..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('appLock')">
+                        <button type="button" class="security-compact-btn is-amber" onclick="enableSecurityPassword('appLock')">تفعيل وحفظ</button>
                     </div>
                     <div id="appLockEnabledControls" class="security-actions-row" style="display:none;">
                         <button type="button" class="security-action-btn is-change" onclick="openSecurityActionPrompt('appLock', 'change')">تغيير كلمة المرور</button>
@@ -884,9 +885,9 @@
                         <span class="security-sub-title">حماية عمليات الحذف</span>
                         <span class="security-status-badge is-disabled" id="deletePwdStatusBadge">غير مفعّلة</span>
                     </div>
-                    <div id="deletePwdDisabledControls" class="wallets-add-inline-form">
-                        <input type="password" id="newDeletePwdInput" class="form-input-control wallets-add-input" placeholder="أدخل كلمة مرور الحذف..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('delete')">
-                        <button type="button" class="wallets-add-btn" onclick="enableSecurityPassword('delete')">تفعيل وحفظ</button>
+                    <div id="deletePwdDisabledControls" class="security-compact-row">
+                        <input type="password" id="newDeletePwdInput" class="form-input-control security-compact-input" placeholder="أدخل كلمة مرور الحذف..." autocomplete="new-password" onkeydown="if(event.key==='Enter') enableSecurityPassword('delete')">
+                        <button type="button" class="security-compact-btn is-amber" onclick="enableSecurityPassword('delete')">تفعيل وحفظ</button>
                     </div>
                     <div id="deletePwdEnabledControls" class="security-actions-row" style="display:none;">
                         <button type="button" class="security-action-btn is-change" onclick="openSecurityActionPrompt('delete', 'change')">تغيير كلمة المرور</button>
@@ -894,9 +895,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="modal-sheet-footer">
-            <button type="button" class="modal-cancel-btn" style="padding: 12px;" onclick="closeGlassModal('securitySyncModal')">عودة</button>
         </div>
     </div>
 </div>

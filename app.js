@@ -1589,11 +1589,17 @@
         });
     }
 
+    function syncHomePeriodButtons() {
+        const dayBtn = document.getElementById("btnHomeDayReset");
+        const allBtn = document.getElementById("btnHomeAllReset");
+        if (dayBtn) dayBtn.classList.toggle("is-active", activePeriodKey === "day" && formatISODate(activeRefDate) === formatISODate(new Date()));
+        if (allBtn) allBtn.classList.toggle("is-active", activePeriodKey === "all");
+    }
+
     function selectTimePeriod(key, btn) {
         activePeriodKey = key;
         if (key === "day") activeRefDate = new Date();
-        const dayBtn = document.getElementById("btnHomeDayReset");
-        if (dayBtn) dayBtn.classList.toggle("is-active", key === "day");
+        syncHomePeriodButtons();
         renderMainState();
     }
 
@@ -1613,8 +1619,7 @@
         const [y, m, d] = val.split("-").map(Number);
         activeRefDate = new Date(y, m - 1, d);
         activePeriodKey = "day";
-        const dayBtn = document.getElementById("btnHomeDayReset");
-        if (dayBtn) dayBtn.classList.toggle("is-active", formatISODate(activeRefDate) === formatISODate(new Date()));
+        syncHomePeriodButtons();
         closeGlassModal("homeDatePickerModal");
         renderMainState();
     }
@@ -1626,8 +1631,7 @@
         customPickedStartDate = sVal;
         customPickedEndDate = eVal;
         activePeriodKey = "custom";
-        const dayBtn = document.getElementById("btnHomeDayReset");
-        if (dayBtn) dayBtn.classList.remove("is-active");
+        syncHomePeriodButtons();
         closeGlassModal("homeDatePickerModal");
         renderMainState();
     }
@@ -1651,7 +1655,11 @@
     }
 
     function offsetActiveDate(step) {
-        if (activePeriodKey === "day") activeRefDate.setDate(activeRefDate.getDate() + step);
+        if (activePeriodKey === "all") {
+            activePeriodKey = "day";
+            activeRefDate.setDate(activeRefDate.getDate() + step);
+        }
+        else if (activePeriodKey === "day") activeRefDate.setDate(activeRefDate.getDate() + step);
         else if (activePeriodKey === "week") activeRefDate.setDate(activeRefDate.getDate() + (step * 7));
         else if (activePeriodKey === "month") activeRefDate.setMonth(activeRefDate.getMonth() + step);
         else if (activePeriodKey === "custom") {
@@ -1662,8 +1670,7 @@
             const customInp = document.getElementById("customStartDateInput");
             if (customInp) customInp.value = customPickedStartDate;
         }
-        const dayBtn = document.getElementById("btnHomeDayReset");
-        if (dayBtn) dayBtn.classList.toggle("is-active", activePeriodKey === "day" && formatISODate(activeRefDate) === formatISODate(new Date()));
+        syncHomePeriodButtons();
         renderMainState();
     }
 
@@ -1680,6 +1687,7 @@
     }
 
     function getTimeFilterRange() {
+        if (activePeriodKey === "all") return { type: "all" };
         const todayStr = formatISODate(new Date());
         if (activePeriodKey === "custom") return { type: "range", start: customPickedStartDate, end: customPickedEndDate || todayStr };
         const ty = activeRefDate.getFullYear();
@@ -1844,8 +1852,8 @@
             if (!archivedClients.includes(c)) totalClientCredits += (clientLedgers[c].credit || 0);
         }
 
-        const homeDebtPeriodWord = (activePeriodKey === "day") ? "اليوم" : "الفترة";
-        document.getElementById("homeTotalDebtsBanner").innerText = `${todayNewDebts.toLocaleString("en-US", { maximumFractionDigits: 2 })} دين ${homeDebtPeriodWord}`;
+        const homePeriodWord = activePeriodKey === "all" ? "الكل" : (activePeriodKey === "day" ? "اليوم" : "الفترة");
+        document.getElementById("homeTotalDebtsBanner").innerText = `${todayNewDebts.toLocaleString("en-US", { maximumFractionDigits: 2 })} دين ${homePeriodWord}`;
         const expBannerEl = document.getElementById("homeTotalExpenseBanner");
         if (expBannerEl) expBannerEl.innerText = allWalletsPeriodExpense.toLocaleString("en-US", { maximumFractionDigits: 2 });
         const incBannerEl = document.getElementById("homeTotalIncomeBanner");
@@ -1868,7 +1876,8 @@
             eqNetEl.className = `eq-num ${eqNet < 0 ? "red" : "green"}`;
         }
         const isDayMode = (activePeriodKey === "day");
-        const periodWord = isDayMode ? "اليوم" : "الفترة";
+        const isAllMode = (activePeriodKey === "all");
+        const periodWord = isAllMode ? "الكل" : (isDayMode ? "اليوم" : "الفترة");
         const incTileTitleEl = document.getElementById("homeIncomeTileTitle");
         const expTileTitleEl = document.getElementById("homeExpenseTileTitle");
         if (incTileTitleEl) incTileTitleEl.innerText = `دخل ${periodWord}`;
@@ -1879,7 +1888,9 @@
         const histTileSubEl = document.getElementById("homeHistoryCountBanner");
         if (histTileSubEl) {
             const periodCnt = periodItems.length;
-            histTileSubEl.innerText = periodCnt > 0 ? (isDayMode ? `${periodCnt} حركة اليوم` : `${periodCnt} حركة`) : "عرض الكل";
+            histTileSubEl.innerText = isAllMode
+                ? `${periodCnt} حركة`
+                : (periodCnt > 0 ? (isDayMode ? `${periodCnt} حركة اليوم` : `${periodCnt} حركة`) : "عرض الكل");
         }
         const credBannerEl = document.getElementById("homeTotalCreditsBanner");
         if (credBannerEl) credBannerEl.innerText = totalClientCredits.toLocaleString("en-US", { maximumFractionDigits: 2 });
@@ -2532,6 +2543,8 @@
             lbl.innerText = `${formatNumericDateSlash(firstDate)} ~ ${formatNumericDateSlash(lastDate)}`;
         } else if (activePeriodKey === "custom") {
             lbl.innerText = `${customPickedStartDate.replace(/-/g, '/')} → ${(customPickedEndDate || formatISODate(new Date())).replace(/-/g, '/')}`;
+        } else if (activePeriodKey === "all") {
+            lbl.innerText = "كل الفترات";
         }
     }
 
@@ -3087,14 +3100,21 @@
     }
 
     let pendingConfirmRequiresDeletePwd = false;
+    let pendingConfirmExpectedPwd = "";
 
-    function promptConfirmDialog(title, msg, callback, requireDeletePwd = true, confirmLabel = "تأكيد الحذف") {
+    function promptConfirmDialog(title, msg, callback, requireDeletePwd = true, confirmLabel = "تأكيد الحذف", expectedPwdOverride = null) {
         document.getElementById("confirmBoxHeader").innerText = title;
         document.getElementById("confirmBoxMessage").innerText = msg;
         const approveBtn = document.getElementById("confirmApprovedBtn");
         if (approveBtn) approveBtn.innerText = confirmLabel || "تأكيد الحذف";
         pendingConfirmCallback = callback;
-        pendingConfirmRequiresDeletePwd = Boolean(requireDeletePwd && deletePassword);
+        if (typeof expectedPwdOverride === "string" && expectedPwdOverride.length > 0) {
+            pendingConfirmExpectedPwd = expectedPwdOverride;
+            pendingConfirmRequiresDeletePwd = true;
+        } else {
+            pendingConfirmExpectedPwd = deletePassword || "";
+            pendingConfirmRequiresDeletePwd = Boolean(requireDeletePwd && deletePassword);
+        }
 
         const pwdBox = document.getElementById("confirmDeletePwdBox");
         const pwdInp = document.getElementById("confirmDeletePwdInput");
@@ -3110,13 +3130,13 @@
     }
 
     function runApprovedAction() {
-        if (pendingConfirmRequiresDeletePwd && deletePassword) {
+        if (pendingConfirmRequiresDeletePwd && pendingConfirmExpectedPwd) {
             const pwdInp = document.getElementById("confirmDeletePwdInput");
             const pwdErr = document.getElementById("confirmDeletePwdErr");
             const entered = pwdInp ? pwdInp.value : "";
-            if (entered !== deletePassword) {
+            if (entered !== pendingConfirmExpectedPwd) {
                 if (pwdErr) pwdErr.style.display = "block";
-                displayToast("كلمة مرور الحذف غير صحيحة!", true);
+                displayToast("كلمة المرور غير صحيحة!", true);
                 if (pwdInp) pwdInp.focus();
                 return;
             }
@@ -3124,6 +3144,7 @@
         const cb = pendingConfirmCallback;
         pendingConfirmCallback = null;
         pendingConfirmRequiresDeletePwd = false;
+        pendingConfirmExpectedPwd = "";
         closeGlassModal("confirmAlertModal");
         if (typeof cb === "function") cb();
     }

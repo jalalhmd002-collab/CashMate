@@ -4042,20 +4042,22 @@
             margin: 0 0 12px 0;
         }
         .home-day-reset-btn {
-            flex: 0 0 24%;
-            min-width: 68px;
+            flex: 0 0 auto;
+            min-width: 52px;
+            padding: 0 12px;
             height: 44px;
             border-radius: 16px;
             background: #FFFFFF;
             border: 1px solid rgba(0, 0, 0, 0.05);
             color: #007AFF;
-            font-size: 0.94rem;
+            font-size: 0.9rem;
             font-weight: 700 !important;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            white-space: nowrap;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .home-day-reset-btn.is-active {
@@ -4066,6 +4068,8 @@
         }
         .home-day-reset-btn:active { transform: scale(0.96); }
         .date-stepper-glass {
+            flex: 1;
+            min-width: 0;
             height: 44px;
             min-height: 44px;
         }
@@ -4300,13 +4304,13 @@
         /* بطاقة المزامنة السحابية ومعرّف الجهاز في الإعدادات */
         .cloud-sync-card {
             background: #F8F9FA;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 18px;
-            padding: 13px;
-            margin-bottom: 10px;
+            border: 1px solid var(--border-glass-base);
+            border-radius: 16px;
+            padding: 15px 16px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
         .cloud-sync-header {
             display: flex;
@@ -4337,14 +4341,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
+            gap: 10px;
             background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 12px;
-            padding: 8px 12px;
+            border: 1px solid var(--border-glass-base);
+            border-radius: 14px;
+            padding: 12px 14px;
         }
         .device-id-code-txt {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 800 !important;
             color: #2563EB;
             letter-spacing: 0.8px;
@@ -4352,27 +4356,31 @@
             user-select: all;
         }
         .device-copy-btn {
-            height: 34px;
-            padding: 0 12px;
-            border-radius: 10px;
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
             border: none;
             background: #EFF6FF;
             color: #2563EB;
             font-size: 0.82rem;
             font-weight: 700 !important;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
             transition: var(--transition-smooth);
         }
         .device-copy-btn:hover { background: #DBEAFE; }
         .device-copy-btn:active { transform: scale(0.95); }
         .device-return-orig-btn {
-            height: 34px;
-            padding: 0 10px;
-            border-radius: 10px;
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
             border: 1px solid rgba(245, 158, 11, 0.35);
             background: rgba(245, 158, 11, 0.14);
             color: #D97706;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-weight: 700 !important;
             cursor: pointer;
             display: inline-flex;
@@ -4383,26 +4391,74 @@
         }
         .device-return-orig-btn:hover { background: rgba(245, 158, 11, 0.24); }
         .device-return-orig-btn:active { transform: scale(0.95); }
+        .security-divider-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-glass-base);
+        }
+        .security-compact-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .security-compact-input {
+            flex: 1;
+            min-width: 0;
+            height: 42px !important;
+            min-height: 42px !important;
+            box-sizing: border-box !important;
+        }
+        .security-compact-btn {
+            flex-shrink: 0;
+            width: auto;
+            padding: 0 16px;
+            height: 42px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 700 !important;
+            color: #FFFFFF;
+            white-space: nowrap;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+        .security-compact-btn.is-blue {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.22);
+        }
+        .security-compact-btn.is-amber {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            box-shadow: 0 3px 10px rgba(217, 119, 6, 0.22);
+        }
+        .security-compact-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .security-compact-btn:active { transform: scale(0.97); }
 
         /* بطاقة الأمان وكلمات المرور + شاشة قفل الدخول بأسلوب Apple */
         .security-settings-card {
             background: #F8F9FA;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 18px;
-            padding: 13px;
-            margin-bottom: 10px;
+            border: 1px solid var(--border-glass-base);
+            border-radius: 16px;
+            padding: 15px 16px;
+            margin-bottom: 4px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
         .security-sub-box {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 14px;
-            padding: 11px 12px;
+            background: transparent;
+            border: none;
+            border-top: 1px solid var(--border-glass-base);
+            border-radius: 0;
+            padding: 14px 0 0 0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
         .security-sub-header {
             display: flex;
@@ -4843,10 +4899,19 @@
             color: #F1F5F9 !important;
         }
         body.slate-mode .cloud-sync-card,
-        body.slate-mode .device-id-display-row,
-        body.slate-mode .security-settings-card,
-        body.slate-mode .security-sub-box {
+        body.slate-mode .security-settings-card {
             background: #343940 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
+        body.slate-mode .device-id-display-row {
+            background: #2E3238 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #F1F5F9 !important;
+        }
+        body.slate-mode .security-sub-box,
+        body.slate-mode .security-divider-section {
+            background: transparent !important;
             border-color: rgba(255, 255, 255, 0.08) !important;
             color: #F1F5F9 !important;
         }
